@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyanotype Archive - Terminal</title>
+  <style>
+    /* === CSS 공통 영역 === */
+    :root {
+      --vivid-blue: #0033FF;
+      --bg-white: #f8f9fa;
+      --crt-dark: #0a0a0a;
+    }
+    
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: var(--crt-dark);
+      color: var(--vivid-blue);
+      overflow: hidden;
+    }
+
+    @keyframes flicker { 0% { opacity: 0.95; } 100% { opacity: 1; } }
+    .crt-flicker { animation: flicker 0.15s infinite; }
+
+    .crt-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+      background-size: 100% 4px;
+      pointer-events: none; z-index: 100; opacity: 0.6;
+    }
+
+    #start-screen {
+      position: absolute; inset: 0; display: flex;
+      justify-content: center; align-items: center;
+      z-index: 60; transition: opacity 0.5s ease;
+    }
+
+    .retro-btn {
+      background: transparent; color: var(--vivid-blue);
+      border: 2px solid var(--vivid-blue); padding: 12px 24px;
+      font-size: 1rem; font-family: monospace; font-weight: bold;
+      letter-spacing: 3px; cursor: pointer; text-transform: uppercase;
+      box-shadow: 0 0 10px var(--vivid-blue), inset 0 0 10px var(--vivid-blue);
+      text-shadow: 0 0 5px var(--vivid-blue); transition: all 0.2s ease;
+    }
+
+    .retro-btn:hover { background: var(--vivid-blue); color: var(--crt-dark); }
+
+    #exposure-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: var(--vivid-blue); opacity: 0; z-index: 40; transition: opacity 0.2s ease;
+    }
+    #exposure-bg.exposed { opacity: 1; }
+
+    #scanner-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 80; pointer-events: none; opacity: 0;
+    }
+    #scanner-overlay.scanning { opacity: 1; }
+
+    .scanner-light {
+      position: absolute; left: 0; width: 100%; height: 3px;
+      background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8);
+      z-index: 10; top: 0%;
+    }
+
+    @keyframes light-down { 0% { top: 0%; } 100% { top: 100%; } }
+    .scanning .scanner-light { animation: light-down 2.5s linear forwards; }
+
+    .page-layer {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      clip-path: inset(0 0 100% 0); z-index: 45;
+    }
+
+    .page-layer.scanning {
+      animation: wipe-down 2.5s linear forwards;
+      pointer-events: auto;
+    }
+
+    @keyframes wipe-down { 0% { clip-path: inset(0 0 100% 0); } 100% { clip-path: inset(0 0 0% 0); } }
+
+    /* 페이지별 개별 설정 */
+    #main-content { background-color: var(--bg-white); }
+    #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
+    #members-page { background-color: var(--bg-white); color: var(--vivid-blue); }
+    #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); overflow: hidden; }
+
+    /* --- 매거진 스태킹 스타일 --- */
+    .stack-container {
+      position: relative; width: 100%; height: 60vh;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .stack-item {
+      position: absolute; cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px; /* 클릭 감지 영역 확대 */
+    }
+    .stack-item:nth-child(1) { transform: translate(-15%, -20%) rotate(-6deg); z-index: 10; }
+    .stack-item:nth-child(2) { transform: translate(10%, -5%) rotate(4deg); z-index: 9; }
+    .stack-item:nth-child(3) { transform: translate(-5%, 15%) rotate(-2deg); z-index: 8; }
+    .stack-item:nth-child(4) { transform: translate(15%, 10%) rotate(7deg); z-index: 7; }
+
+    .stack-item:hover {
+      z-index: 100 !important;
+      transform: translate(0, 0) rotate(0deg) scale(1.1) !important;
+    }
+    .stack-title {
+      font-size: 8vw; font-weight: 900; line-height: 0.8;
+      text-transform: uppercase; letter-spacing: -5px;
+      -webkit-text-stroke: 1px var(--bg-white); color: transparent;
+      transition: all 0.3s ease;
+    }
+    .stack-item:hover .stack-title { color: var(--bg-white); -webkit-text-stroke: 0px; }
+    .stack-preview {
+      width: 12vw; aspect-ratio: 3/4; background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--bg-white); margin-top: -10px; opacity: 0;
+      transform: translateY(10px); transition: all 0.4s ease;
+      background-size: cover; background-position: center;
+    }
+    .stack-item:hover .stack-preview { opacity: 1; transform: translateY(0); }
+
+    /* --- 아카이브 그리드 스타일 (복구됨) --- */
+    .archive-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem;
+      width: 80%; max-width: 1100px; margin-bottom: 3rem;
+    }
+    .leaflet-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+    .leaflet-cover {
+      width: 100%; aspect-ratio: 3/4; border: 1px solid var(--vivid-blue);
+      position: relative; display: flex; justify-content: center; align-items: center;
+      font-size: 2rem; font-weight: bold; transition: all 0.4s ease;
+    }
+    .leaflet-cover::before, .leaflet-cover::after {
+      content: ''; position: absolute; inset: 0; border: 1px dashed var(--vivid-blue);
+      z-index: -1; opacity: 0.3; transition: all 0.4s ease;
+    }
+    .leaflet-item:hover .leaflet-cover { background: rgba(0, 51, 255, 0.1); transform: translateY(-5px); }
+    .leaflet-item:hover .leaflet-cover::before { transform: translate(-8px, 8px); opacity: 0.5; }
+    .leaflet-item:hover .leaflet-cover::after { transform: translate(8px, -8px); opacity: 0.5; }
+    .leaflet-title { margin-top: 1rem; font-family: monospace; font-size: 0.9rem; letter-spacing: 2px; }
+
+    /* 메인 네비게이션 */
+    .menu-title { font-size: 5rem; font-weight: 900; text-transform: uppercase; letter-spacing: -2px; }
+    nav { display: flex; flex-direction: column; gap: 3rem; text-align: center; }
+    .menu-item { text-decoration: none; color: inherit; }
+    .menu-desc { font-size: 0.9rem; letter-spacing: 2px; opacity: 0.7; display: block; }
+  </style>
+</head>
+<body class="crt-flicker">
+  <div class="crt-overlay"></div>
+  <div id="start-screen"><button id="expose-btn" class="retro-btn">[ INITIATE EXPOSURE ]</button></div>
+  <div id="exposure-bg"></div>
+  <div id="scanner-overlay"><div class="scanner-light"></div></div>
+
+  <div id="main-content" class="page-layer">
+    <nav>
+      <a href="#" id="link-magazine" class="menu-item"><h1 class="menu-title">Magazine</h1><span class="menu-desc">Our Printed Issues</span></a>
+      <a href="#" id="link-archive" class="menu-item"><h1 class="menu-title">Archive</h1><span class="menu-desc">Layered Workspaces</span></a>
+      <a href="#" id="link-members" class="menu-item"><h1 class="menu-title">Members</h1><span class="menu-desc">Developed Profiles</span></a>
+    </nav>
+  </div>
+
+  <div id="magazine-page" class="page-layer">
+    <div class="stack-container">
+      <div class="stack-item"><h2 class="stack-title">Issue_01</h2><div class="stack-preview"></div></div>
+      <div class="stack-item"><h2 class="stack-title">Issue_02</h2><div class="stack-preview"></div></div>
+      <div class="stack-item"><h2 class="stack-title">Issue_03</h2><div class="stack-preview"></div></div>
+      <div class="stack-item"><h2 class="stack-title">Issue_04</h2><div class="stack-preview"></div></div>
+    </div>
+    <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
+  </div>
+
+  <div id="archive-page" class="page-layer">
+    <h1 class="page-title" style="font-size: 3rem;">LAYERED WORKSPACES</h1>
+    <div class="archive-grid">
+      <div class="leaflet-item"><div class="leaflet-cover">01</div><div class="leaflet-title">MANIFESTO</div></div>
+      <div class="leaflet-item"><div class="leaflet-cover">02</div><div class="leaflet-title">BLUEPRINT</div></div>
+      <div class="leaflet-item"><div class="leaflet-cover">03</div><div class="leaflet-title">CYAN_EXPO</div></div>
+      <div class="leaflet-item"><div class="leaflet-cover">04</div><div class="leaflet-title">REACTION</div></div>
+    </div>
+    <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
+  </div>
+
+  <div id="members-page" class="page-layer"><h1 class="page-title">DEVELOPED PROFILES</h1><button class="retro-btn btn-return">[ RETURN TO MENU ]</button></div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const exposeBtn = document.getElementById('expose-btn'), startScreen = document.getElementById('start-screen'), exposureBg = document.getElementById('exposure-bg'), scannerOverlay = document.getElementById('scanner-overlay');
+      const pages = { main: document.getElementById('main-content'), magazine: document.getElementById('magazine-page'), archive: document.getElementById('archive-page'), members: document.getElementById('members-page') };
+      const links = { magazine: document.getElementById('link-magazine'), archive: document.getElementById('link-archive'), members: document.getElementById('link-members') };
+      
+      let currentPage = null, isAnimating = false;
+
+      function triggerAnimation(el, cls) {
+        el.classList.remove(cls);
+        requestAnimationFrame(() => { requestAnimationFrame(() => { el.classList.add(cls); }); });
+      }
+
+      function navigateTo(target) {
+        if (isAnimating || currentPage === target) return;
+        isAnimating = true;
+        triggerAnimation(scannerOverlay, 'scanning');
+        if (currentPage) currentPage.style.zIndex = 45;
+        target.style.zIndex = 55;
+        triggerAnimation(target, 'scanning');
+        setTimeout(() => {
+          Object.values(pages).forEach(p => { if (p !== target) { p.classList.remove('scanning'); p.style.zIndex = 40; } });
+          isAnimating = false;
+        }, 2500);
+        currentPage = target;
+      }
+
+      exposeBtn.addEventListener('click', () => {
+        startScreen.style.opacity = '0'; startScreen.style.pointerEvents = 'none';
+        exposureBg.classList.add('exposed');
+        setTimeout(() => { navigateTo(pages.main); }, 400);
+      });
+
+      links.magazine.addEventListener('click', (e) => { e.preventDefault(); navigateTo(pages.magazine); });
+      links.archive.addEventListener('click', (e) => { e.preventDefault(); navigateTo(pages.archive); });
+      links.members.addEventListener('click', (e) => { e.preventDefault(); navigateTo(pages.members); });
+      document.querySelectorAll('.btn-return').forEach(b => b.addEventListener('click', () => navigateTo(pages.main)));
+    });
+  </script>
+</body>
+</html>

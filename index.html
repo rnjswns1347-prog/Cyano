@@ -175,14 +175,49 @@
     .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
 
     /* =========================================
-       5. 반응형 웹 최적화 (Mobile UI)
+       5. 반응형 웹 최적화 (Mobile UI 대폭 강화)
        ========================================= */
     @media (max-width: 768px) {
-      .menu-title { font-size: 3.5rem; }
-      .magazine-split-view { flex-direction: column; height: 75vh; }
-      .mag-list-side { padding-left: 0; border-left: none; align-items: center; }
-      .archive-grid { grid-template-columns: repeat(2, 1fr); }
-      .members-initial-grid { display: flex; flex-direction: column; }
+      /* 전역 및 네비게이션 */
+      #global-logo { top: 20px; left: 20px; font-size: 1.1rem; }
+      .menu-title { font-size: 3rem; }
+      nav { gap: 2rem; }
+
+      /* 1. 매거진 페이지 (상하 배치 및 텍스트 상자 비율 최적화) */
+      .magazine-split-view { flex-direction: column; height: 80vh; justify-content: flex-start; gap: 1rem; margin-top: 50px; }
+      .mag-list-side { flex: none; width: 100%; border-left: none; padding-left: 0; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px; align-items: center; }
+      .mag-label { font-size: 2.2rem; }
+      .mag-item.active { transform: translateY(-5px); } 
+      #mag-display-box { width: 85%; padding: 20px; height: 45vh; }
+      #mag-content-overlay { font-size: 0.9rem; }
+
+      /* 2. 아카이브 페이지 (그리드 간격 축소 및 상세 페이지 상하 분할) */
+      .archive-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 90%; margin-bottom: 4rem; }
+      .page-title { font-size: 2rem !important; margin-bottom: 1rem; margin-top: 30px; }
+      
+      /* 상세 페이지 (좌우 -> 상하) */
+      .detail-container { flex-direction: column; height: 75vh; gap: 15px; padding-top: 40px; }
+      .detail-image-area { min-height: 45%; width: 100%; }
+      .detail-text-area { text-align: center; justify-content: flex-start; overflow-y: auto; padding-bottom: 20px; }
+      .detail-text-area h2 { font-size: 2rem; margin-bottom: 10px; }
+      .detail-text-area p { font-size: 0.95rem; }
+
+      /* 3. 멤버 페이지 (터치 환경에 맞춘 리스트형 전환) */
+      .members-initial-grid { display: flex; flex-direction: column; height: 75vh; overflow-y: auto; gap: 2.5rem; padding-top: 40px; width: 90%; }
+      .grid-crosshair-x, .grid-crosshair-y { display: none; } 
+      
+      .member-box { flex-direction: column; width: 100%; position: relative; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed rgba(0, 51, 255, 0.3); }
+      .member-box:last-child { border-bottom: none; }
+      
+      .member-initial { font-size: 4rem; opacity: 1; text-align: center; margin-bottom: 5px; } 
+      .members-initial-grid:hover .member-initial { opacity: 1; } 
+      
+      .member-detail { position: relative; opacity: 1; pointer-events: auto; width: 100%; transform: none !important; padding: 0 !important; text-align: center !important; }
+      .detail-name { font-size: 2.2rem; margin-bottom: 10px; }
+      .detail-manifesto { font-size: 0.95rem; }
+
+      /* 4. 하단 탈출 버튼 (크기 축소 및 위치 보정) */
+      .btn-return, .btn-back-archive { bottom: 2% !important; font-size: 0.8rem; padding: 10px 16px; white-space: nowrap; }
     }
   </style>
 </head>

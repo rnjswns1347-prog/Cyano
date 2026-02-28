@@ -26,25 +26,34 @@
     .crt-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-      background-size: 100% 4px;
-      pointer-events: none; z-index: 100; opacity: 0.6;
+      background-size: 100% 4px; pointer-events: none; z-index: 100; opacity: 0.6;
     }
 
+    /* 전역 네비게이션 로고 (CYANO) */
+    #global-logo {
+      position: fixed; top: 40px; left: 50px; font-size: 1.5rem; font-weight: 900;
+      letter-spacing: 4px; cursor: pointer; z-index: 9999;
+      transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      color: var(--vivid-blue);
+    }
+    #global-logo:hover { opacity: 0.6; }
+    #global-logo.theme-blue { color: var(--vivid-blue); }
+    #global-logo.theme-black { color: var(--crt-dark); }
+    #global-logo.theme-white { color: var(--bg-white); }
+
+    /* 오프닝 화면 */
     #start-screen {
-      position: absolute; inset: 0; display: flex;
-      justify-content: center; align-items: center;
-      z-index: 60; transition: opacity 0.5s ease;
+      position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
+      z-index: 60; transition: opacity 0.5s ease; background-color: var(--crt-dark);
     }
 
     .retro-btn {
-      background: transparent; color: var(--vivid-blue);
-      border: 2px solid var(--vivid-blue); padding: 12px 24px;
-      font-size: 1rem; font-family: monospace; font-weight: bold;
+      background: transparent; color: var(--vivid-blue); border: 2px solid var(--vivid-blue); 
+      padding: 12px 24px; font-size: 1rem; font-family: monospace; font-weight: bold;
       letter-spacing: 3px; cursor: pointer; text-transform: uppercase;
       box-shadow: 0 0 10px var(--vivid-blue), inset 0 0 10px var(--vivid-blue);
       text-shadow: 0 0 5px var(--vivid-blue); transition: all 0.2s ease;
     }
-
     .retro-btn:hover { background: var(--vivid-blue); color: var(--crt-dark); }
 
     #exposure-bg {
@@ -61,10 +70,8 @@
 
     .scanner-light {
       position: absolute; left: 0; width: 100%; height: 3px;
-      background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8);
-      z-index: 10; top: 0%;
+      background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8); z-index: 10; top: 0%;
     }
-
     @keyframes light-down { 0% { top: 0%; } 100% { top: 100%; } }
     .scanning .scanner-light { animation: light-down 2.5s linear forwards; }
 
@@ -73,56 +80,43 @@
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       clip-path: inset(0 0 100% 0); z-index: 45;
     }
-
-    .page-layer.scanning {
-      animation: wipe-down 2.5s linear forwards;
-      pointer-events: auto;
-    }
-
+    .page-layer.scanning { animation: wipe-down 2.5s linear forwards; pointer-events: auto; }
     @keyframes wipe-down { 0% { clip-path: inset(0 0 100% 0); } 100% { clip-path: inset(0 0 0% 0); } }
 
-    /* 페이지별 개별 설정 */
     #main-content { background-color: var(--bg-white); }
     #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     #members-page { background-color: var(--bg-white); color: var(--vivid-blue); }
-    #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); overflow: hidden; }
+    #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
 
-    /* --- 매거진 스태킹 스타일 --- */
-    .stack-container {
-      position: relative; width: 100%; height: 60vh;
-      display: flex; justify-content: center; align-items: center;
+    /* 매거진 스플릿 뷰 스타일 */
+    .magazine-split-view {
+      display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative;
     }
-    .stack-item {
-      position: absolute; cursor: pointer;
-      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-      display: flex; flex-direction: column; align-items: center;
-      padding: 20px; /* 클릭 감지 영역 확대 */
+    .mag-list-side {
+      flex: 1.2; display: flex; flex-direction: column; gap: 1.5rem;
+      border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px;
     }
-    .stack-item:nth-child(1) { transform: translate(-15%, -20%) rotate(-6deg); z-index: 10; }
-    .stack-item:nth-child(2) { transform: translate(10%, -5%) rotate(4deg); z-index: 9; }
-    .stack-item:nth-child(3) { transform: translate(-5%, 15%) rotate(-2deg); z-index: 8; }
-    .stack-item:nth-child(4) { transform: translate(15%, 10%) rotate(7deg); z-index: 7; }
+    .mag-item { cursor: pointer; transition: all 0.5s ease; opacity: 0.3; display: flex; align-items: baseline; gap: 25px; }
+    .mag-item.active { opacity: 1; transform: translateX(30px); }
+    .mag-num { font-family: monospace; font-size: 1.2rem; font-weight: bold; }
+    .mag-label { font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 900; margin: 0; line-height: 1; letter-spacing: -3px; text-transform: uppercase; }
+    .mag-preview-side { flex: 0.8; display: flex; justify-content: center; align-items: center; }
+    #mag-display-box {
+      width: clamp(250px, 20vw, 350px); aspect-ratio: 3/4; border: 1px solid var(--bg-white);
+      background-size: cover; background-position: center; background-color: rgba(255,255,255,0.05);
+      box-shadow: 0 0 40px rgba(0,0,0,0.4); transition: all 0.6s ease; transform: rotate(1deg); opacity: 0;
+    }
+    
+    #magazine-page .btn-return {
+      position: absolute !important; bottom: 5% !important; left: 50% !important;
+      transform: translateX(-50%) !important; z-index: 999 !important;
+      color: var(--bg-white) !important; border-color: var(--bg-white) !important;
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.8) !important;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.5) !important;
+    }
+    #magazine-page .btn-return:hover { background: var(--bg-white) !important; color: var(--vivid-blue) !important; }
 
-    .stack-item:hover {
-      z-index: 100 !important;
-      transform: translate(0, 0) rotate(0deg) scale(1.1) !important;
-    }
-    .stack-title {
-      font-size: 8vw; font-weight: 900; line-height: 0.8;
-      text-transform: uppercase; letter-spacing: -5px;
-      -webkit-text-stroke: 1px var(--bg-white); color: transparent;
-      transition: all 0.3s ease;
-    }
-    .stack-item:hover .stack-title { color: var(--bg-white); -webkit-text-stroke: 0px; }
-    .stack-preview {
-      width: 12vw; aspect-ratio: 3/4; background-color: rgba(255, 255, 255, 0.1);
-      border: 1px solid var(--bg-white); margin-top: -10px; opacity: 0;
-      transform: translateY(10px); transition: all 0.4s ease;
-      background-size: cover; background-position: center;
-    }
-    .stack-item:hover .stack-preview { opacity: 1; transform: translateY(0); }
-
-    /* --- 아카이브 그리드 스타일 (복구됨) --- */
+    /* 아카이브 그리드 스타일 */
     .archive-grid {
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem;
       width: 80%; max-width: 1100px; margin-bottom: 3rem;
@@ -132,26 +126,91 @@
       width: 100%; aspect-ratio: 3/4; border: 1px solid var(--vivid-blue);
       position: relative; display: flex; justify-content: center; align-items: center;
       font-size: 2rem; font-weight: bold; transition: all 0.4s ease;
+      background-size: cover; background-position: center;
+      background-blend-mode: multiply; background-color: var(--vivid-blue);
+      color: var(--bg-white); text-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
     .leaflet-cover::before, .leaflet-cover::after {
-      content: ''; position: absolute; inset: 0; border: 1px dashed var(--vivid-blue);
-      z-index: -1; opacity: 0.3; transition: all 0.4s ease;
+      content: ''; position: absolute; inset: 0; border: 1px dashed var(--vivid-blue); z-index: -1; opacity: 0.3; transition: all 0.4s ease;
     }
-    .leaflet-item:hover .leaflet-cover { background: rgba(0, 51, 255, 0.1); transform: translateY(-5px); }
+    .leaflet-item:hover .leaflet-cover { background-color: rgba(0, 51, 255, 0.8); transform: translateY(-5px); }
     .leaflet-item:hover .leaflet-cover::before { transform: translate(-8px, 8px); opacity: 0.5; }
     .leaflet-item:hover .leaflet-cover::after { transform: translate(8px, -8px); opacity: 0.5; }
     .leaflet-title { margin-top: 1rem; font-family: monospace; font-size: 0.9rem; letter-spacing: 2px; }
+
+    /* 아카이브 상세 페이지 스타일 */
+    .detail-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
+    .detail-container { display: flex; gap: 40px; width: 80%; max-width: 1000px; height: 60vh; align-items: center; }
+    .detail-image-area { flex: 1; height: 100%; background-color: rgba(0, 51, 255, 0.05); border: 1px solid var(--vivid-blue); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .detail-text-area { flex: 1; text-align: left; display: flex; flex-direction: column; justify-content: center; }
+    .detail-text-area h2 { font-size: 3rem; margin: 0 0 20px 0; letter-spacing: -2px; }
+    .detail-text-area p { font-size: 1.1rem; line-height: 1.6; opacity: 0.8; word-break: keep-all; }
+    .btn-back-archive { position: absolute; bottom: 6%; }
 
     /* 메인 네비게이션 */
     .menu-title { font-size: 5rem; font-weight: 900; text-transform: uppercase; letter-spacing: -2px; }
     nav { display: flex; flex-direction: column; gap: 3rem; text-align: center; }
     .menu-item { text-decoration: none; color: inherit; }
     .menu-desc { font-size: 0.9rem; letter-spacing: 2px; opacity: 0.7; display: block; }
+
+    /* 멤버 이니셜 2x2 그리드 스타일 */
+    .members-initial-grid {
+      position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+      width: 80%; max-width: 900px; height: 60vh; margin: 0 auto;
+    }
+    .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
+    .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
+    .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
+    .member-initial { font-size: clamp(8rem, 15vw, 13rem); font-weight: 900; line-height: 1; color: var(--vivid-blue); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .members-initial-grid:hover .member-initial { opacity: 0; }
+    .members-initial-grid .member-box:hover .member-initial { opacity: 1; transform: scale(1.1); text-shadow: 0 0 30px rgba(0, 51, 255, 0.2); }
+    .member-detail {
+      position: absolute; top: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; justify-content: center;
+      opacity: 0; pointer-events: none; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .detail-right { right: 0; padding-left: 60px; transform: translateX(20px); text-align: left; }
+    .detail-left { left: 0; padding-right: 60px; transform: translateX(-20px); text-align: right; }
+    .member-box:hover .member-detail { opacity: 1; pointer-events: none; transform: translateX(0); }
+    .detail-role { font-family: monospace; letter-spacing: 2px; opacity: 0.6; margin-bottom: 5px; font-weight: bold; }
+    .detail-name { font-size: 3.5rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; }
+    .detail-manifesto { font-size: 1.1rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
+    #members-page .btn-return { position: absolute; bottom: 6%; }
+
+    /* =========================================
+       [통합됨] 모바일 최적화 (Responsive UI)
+       ========================================= */
+    @media (max-width: 768px) {
+      #global-logo { left: 20px; top: 20px; font-size: 1.2rem; }
+      .menu-title { font-size: 3.5rem; }
+      .page-title { font-size: 2rem !important; margin-top: 40px; margin-bottom: 1rem !important; }
+      
+      /* 매거진: 상하 분할 */
+      .magazine-split-view { flex-direction: column; height: 75vh; justify-content: flex-start; gap: 2rem; margin-top: 50px; }
+      .mag-list-side { padding-left: 0; border-left: none; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 20px; flex: none; align-items: center; }
+      .mag-label { font-size: 2.5rem; }
+      .mag-item.active { transform: translateX(0) scale(1.1); }
+      #mag-display-box { width: 180px; }
+      
+      /* 아카이브: 2열 그리드 */
+      .archive-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; width: 90%; }
+      .detail-container { flex-direction: column; height: 75vh; overflow-y: auto; padding-top: 20px; }
+      .detail-image-area { min-height: 40%; width: 100%; }
+      .detail-text-area h2 { font-size: 2rem; }
+      
+      /* 멤버 이니셜: 세로 나열 */
+      .members-initial-grid { display: flex; flex-direction: column; height: 75vh; width: 100%; align-items: center; gap: 10px; margin-top: 30px; }
+      .member-initial { font-size: 4rem; }
+      .member-detail { width: 90%; text-align: center !important; transform: none !important; padding: 0 !important; background: rgba(255,255,255,0.95); z-index: 10; border: 1px solid var(--vivid-blue); padding: 20px !important; }
+      .member-box { width: 100%; }
+    }
   </style>
 </head>
 <body class="crt-flicker">
+  
+  <div id="global-logo">CYANO</div>
   <div class="crt-overlay"></div>
-  <div id="start-screen"><button id="expose-btn" class="retro-btn">[ INITIATE EXPOSURE ]</button></div>
+  
+  <div id="start-screen"><button id="expose-btn" class="retro-btn">[ START SCAN ]</button></div>
   <div id="exposure-bg"></div>
   <div id="scanner-overlay"><div class="scanner-light"></div></div>
 
@@ -164,11 +223,14 @@
   </div>
 
   <div id="magazine-page" class="page-layer">
-    <div class="stack-container">
-      <div class="stack-item"><h2 class="stack-title">Issue_01</h2><div class="stack-preview"></div></div>
-      <div class="stack-item"><h2 class="stack-title">Issue_02</h2><div class="stack-preview"></div></div>
-      <div class="stack-item"><h2 class="stack-title">Issue_03</h2><div class="stack-preview"></div></div>
-      <div class="stack-item"><h2 class="stack-title">Issue_04</h2><div class="stack-preview"></div></div>
+    <div class="magazine-split-view">
+      <div class="mag-list-side">
+        <div class="mag-item active" data-img="mag1.jpg"><span class="mag-num">01</span><h2 class="mag-label">CYAN_ORIGIN</h2></div>
+        <div class="mag-item" data-img="mag2.jpg"><span class="mag-num">02</span><h2 class="mag-label">SCAN_LOGIC</h2></div>
+        <div class="mag-item" data-img="mag3.jpg"><span class="mag-num">03</span><h2 class="mag-label">LAYER_STUDY</h2></div>
+        <div class="mag-item" data-img="mag4.jpg"><span class="mag-num">04</span><h2 class="mag-label">FINAL_ARCHIVE</h2></div>
+      </div>
+      <div class="mag-preview-side"><div id="mag-display-box"></div></div>
     </div>
     <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
   </div>
@@ -176,21 +238,54 @@
   <div id="archive-page" class="page-layer">
     <h1 class="page-title" style="font-size: 3rem;">LAYERED WORKSPACES</h1>
     <div class="archive-grid">
-      <div class="leaflet-item"><div class="leaflet-cover">01</div><div class="leaflet-title">MANIFESTO</div></div>
-      <div class="leaflet-item"><div class="leaflet-cover">02</div><div class="leaflet-title">BLUEPRINT</div></div>
-      <div class="leaflet-item"><div class="leaflet-cover">03</div><div class="leaflet-title">CYAN_EXPO</div></div>
-      <div class="leaflet-item"><div class="leaflet-cover">04</div><div class="leaflet-title">REACTION</div></div>
+      <div class="leaflet-item" id="open-detail-1"><div class="leaflet-cover" style="background-image: url('archive_thumb_01.jpg');">01</div><div class="leaflet-title">MANIFESTO</div></div>
+      <div class="leaflet-item" id="open-detail-2"><div class="leaflet-cover" style="background-image: url('archive_thumb_02.jpg');">02</div><div class="leaflet-title">BLUEPRINT</div></div>
+      <div class="leaflet-item" id="open-detail-3"><div class="leaflet-cover" style="background-image: url('archive_thumb_03.jpg');">03</div><div class="leaflet-title">CYAN_EXPO</div></div>
+      <div class="leaflet-item" id="open-detail-4"><div class="leaflet-cover" style="background-image: url('archive_thumb_04.jpg');">04</div><div class="leaflet-title">REACTION</div></div>
     </div>
     <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
   </div>
 
-  <div id="members-page" class="page-layer"><h1 class="page-title">DEVELOPED PROFILES</h1><button class="retro-btn btn-return">[ RETURN TO MENU ]</button></div>
+  <div id="detail-page-1" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area" style="background-image: url('archive_full_01.jpg');"></div><div class="detail-text-area"><h2>MANIFESTO</h2><p>작업물 설명을 입력하세요.</p></div></div><button class="retro-btn btn-back-archive">[ BACK TO ARCHIVE ]</button></div>
+  <div id="detail-page-2" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area" style="background-image: url('archive_full_02.jpg');"></div><div class="detail-text-area"><h2>BLUEPRINT</h2><p>작업물 설명을 입력하세요.</p></div></div><button class="retro-btn btn-back-archive">[ BACK TO ARCHIVE ]</button></div>
+  <div id="detail-page-3" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area" style="background-image: url('archive_full_03.jpg');"></div><div class="detail-text-area"><h2>CYAN_EXPO</h2><p>작업물 설명을 입력하세요.</p></div></div><button class="retro-btn btn-back-archive">[ BACK TO ARCHIVE ]</button></div>
+  <div id="detail-page-4" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area" style="background-image: url('archive_full_04.jpg');"></div><div class="detail-text-area"><h2>REACTION</h2><p>작업물 설명을 입력하세요.</p></div></div><button class="retro-btn btn-back-archive">[ BACK TO ARCHIVE ]</button></div>
+
+  <div id="members-page" class="page-layer">
+    <div class="members-initial-grid">
+      <div class="grid-crosshair-x"></div><div class="grid-crosshair-y"></div>
+      <div class="member-box"><div class="member-initial">M</div><div class="member-detail detail-right"><div class="detail-role">VISUAL JUSTIFIER</div><h2 class="detail-name">M</h2><p class="detail-manifesto">"내가 내 눈으로 본 세상과 의도를 시각적 언어로 번역합니다. 파편화된 이미지들을 모아 흔들리지 않는 하나의 정당한 층(Layer)으로 증명해 냅니다."</p></div></div>
+      <div class="member-box"><div class="member-initial">R</div><div class="member-detail detail-left"><div class="detail-role">LOGIC ARCHITECT</div><h2 class="detail-name">R</h2><p class="detail-manifesto">"우리의 취향이 곧 세계가 되도록 논리의 뼈대를 세웁니다. 관람객이 이 공간에 설득당할 수밖에 없는 완벽한 흐름과 동선을 설계합니다."</p></div></div>
+      <div class="member-box"><div class="member-initial">J</div><div class="member-detail detail-right"><div class="detail-role">TASTE CURATOR</div><h2 class="detail-name">J</h2><p class="detail-manifesto">"무엇이 그럴듯한지, 무엇이 우리의 세계관에 부합하는지 치밀하게 판별합니다. 타협하지 않는 기준으로 이 터미널의 순도를 유지합니다."</p></div></div>
+      <div class="member-box"><div class="member-initial">H</div><div class="member-detail detail-left"><div class="detail-role">CYAN OPERATOR</div><h2 class="detail-name">H</h2><p class="detail-manifesto">"푸른빛의 감광액을 바르고 빛을 쪼여 실체를 기록합니다. 추상적인 우리의 선언을 물리적인 결과물로 변환하여 세상에 남깁니다."</p></div></div>
+    </div>
+    <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
+  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const exposeBtn = document.getElementById('expose-btn'), startScreen = document.getElementById('start-screen'), exposureBg = document.getElementById('exposure-bg'), scannerOverlay = document.getElementById('scanner-overlay');
-      const pages = { main: document.getElementById('main-content'), magazine: document.getElementById('magazine-page'), archive: document.getElementById('archive-page'), members: document.getElementById('members-page') };
-      const links = { magazine: document.getElementById('link-magazine'), archive: document.getElementById('link-archive'), members: document.getElementById('link-members') };
+      const exposeBtn = document.getElementById('expose-btn'), 
+            startScreen = document.getElementById('start-screen'), 
+            exposureBg = document.getElementById('exposure-bg'), 
+            scannerOverlay = document.getElementById('scanner-overlay'),
+            globalLogo = document.getElementById('global-logo');
+      
+      const pages = { 
+            main: document.getElementById('main-content'), 
+            magazine: document.getElementById('magazine-page'), 
+            archive: document.getElementById('archive-page'), 
+            members: document.getElementById('members-page'),
+            detail1: document.getElementById('detail-page-1'),
+            detail2: document.getElementById('detail-page-2'),
+            detail3: document.getElementById('detail-page-3'),
+            detail4: document.getElementById('detail-page-4')
+      };
+      
+      const links = { 
+            magazine: document.getElementById('link-magazine'), 
+            archive: document.getElementById('link-archive'), 
+            members: document.getElementById('link-members') 
+      };
       
       let currentPage = null, isAnimating = false;
 
@@ -202,16 +297,90 @@
       function navigateTo(target) {
         if (isAnimating || currentPage === target) return;
         isAnimating = true;
+
+        document.body.style.pointerEvents = 'none'; // 스캔 중 호버 통제
+
+        if (target === pages.main || target === pages.members) {
+          globalLogo.className = 'theme-black';
+        } else if (target === pages.magazine) {
+          globalLogo.className = 'theme-white';
+        } else {
+          globalLogo.className = 'theme-blue';
+        }
+
         triggerAnimation(scannerOverlay, 'scanning');
         if (currentPage) currentPage.style.zIndex = 45;
         target.style.zIndex = 55;
         triggerAnimation(target, 'scanning');
         setTimeout(() => {
-          Object.values(pages).forEach(p => { if (p !== target) { p.classList.remove('scanning'); p.style.zIndex = 40; } });
+          Object.values(pages).forEach(p => { if (p !== target && p !== null) { p.classList.remove('scanning'); p.style.zIndex = 40; } });
           isAnimating = false;
+          document.body.style.pointerEvents = 'auto'; // 호버 통제 해제
         }, 2500);
         currentPage = target;
+
+        if (target === pages.magazine) { updateMagDisplay(0); }
       }
+
+      // 로고 클릭 시 시스템 리부트 (오프닝 화면 복귀)
+      globalLogo.addEventListener('click', () => {
+        if (currentPage === null || isAnimating) return;
+        isAnimating = true;
+
+        startScreen.style.opacity = '1';
+        startScreen.style.pointerEvents = 'auto';
+        exposureBg.classList.remove('exposed');
+        globalLogo.className = 'theme-blue';
+
+        setTimeout(() => {
+          Object.values(pages).forEach(p => {
+            if (p !== null) { p.classList.remove('scanning'); p.style.zIndex = 40; }
+          });
+          currentPage = null; 
+          isAnimating = false;
+        }, 500);
+      });
+
+      document.getElementById('open-detail-1').addEventListener('click', () => navigateTo(pages.detail1));
+      document.getElementById('open-detail-2').addEventListener('click', () => navigateTo(pages.detail2));
+      document.getElementById('open-detail-3').addEventListener('click', () => navigateTo(pages.detail3));
+      document.getElementById('open-detail-4').addEventListener('click', () => navigateTo(pages.detail4));
+
+      document.querySelectorAll('.btn-back-archive').forEach(btn => {
+        btn.addEventListener('click', () => navigateTo(pages.archive));
+      });
+
+      // 매거진 로직 (방어막 변수 magTimeout 추가됨)
+      const magItems = document.querySelectorAll('.mag-item');
+      const displayBox = document.getElementById('mag-display-box');
+      let currentMagIdx = 0; let isThrottled = false;
+      let magTimeout; 
+
+      function updateMagDisplay(index) {
+        magItems.forEach(item => item.classList.remove('active'));
+        magItems[index].classList.add('active');
+        const imgUrl = magItems[index].getAttribute('data-img');
+        displayBox.style.opacity = '0';
+        
+        clearTimeout(magTimeout); // 레이스 컨디션 방어막
+        
+        magTimeout = setTimeout(() => {
+          displayBox.style.backgroundImage = `url(${imgUrl})`;
+          displayBox.style.opacity = '1';
+          displayBox.style.transform = `rotate(${(Math.random() - 0.5) * 4}deg) scale(1.05)`;
+        }, 200);
+        currentMagIdx = index;
+      }
+
+      magItems.forEach((item, idx) => { item.addEventListener('mouseenter', () => updateMagDisplay(idx)); });
+
+      pages.magazine.addEventListener('wheel', (e) => {
+        if (isThrottled || currentPage !== pages.magazine) return;
+        if (e.deltaY > 0) { currentMagIdx = (currentMagIdx + 1) % magItems.length; } 
+        else { currentMagIdx = (currentMagIdx - 1 + magItems.length) % magItems.length; }
+        updateMagDisplay(currentMagIdx);
+        isThrottled = true; setTimeout(() => { isThrottled = false; }, 600); 
+      }, { passive: true });
 
       exposeBtn.addEventListener('click', () => {
         startScreen.style.opacity = '0'; startScreen.style.pointerEvents = 'none';

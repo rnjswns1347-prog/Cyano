@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cyanotype Archive - Terminal</title>
   <style>
-    /* === CSS 공통 영역 === */
+    /* =========================================
+       1. 전역 변수 및 기본 테마 설정 (Foundation)
+       ========================================= */
     :root {
-      --vivid-blue: #0033FF;
-      --bg-white: #f8f9fa;
-      --crt-dark: #0a0a0a;
+      --vivid-blue: #0033FF; /* 브랜드 컬러: 시아노타입 블루 */
+      --bg-white: #f8f9fa;   /* 용지 색상: 약간 탁한 흰색 */
+      --crt-dark: #0a0a0a;   /* 터미널 배경: 완전한 검은색이 아닌 다크 그레이 */
     }
     
     body, html {
@@ -17,18 +19,38 @@
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       background-color: var(--crt-dark);
       color: var(--vivid-blue);
-      overflow: hidden;
+      overflow: hidden; /* 시스템 외부로 스크롤되는 것을 원천 차단 */
     }
 
+    /* =========================================
+       2. 시각적 이펙트 및 애니메이션 (Visual Effects)
+       ========================================= */
+    /* CRT 모니터 깜빡임 효과 */
     @keyframes flicker { 0% { opacity: 0.95; } 100% { opacity: 1; } }
     .crt-flicker { animation: flicker 0.15s infinite; }
 
+    /* 화면 전체에 깔리는 가로줄 노이즈 (유리판 역할, 클릭 간섭 없도록 pointer-events: none) */
     .crt-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
       background-size: 100% 4px; pointer-events: none; z-index: 100; opacity: 0.6;
     }
 
+    /* 스캐너 빛줄기 애니메이션 */
+    @keyframes light-down { 0% { top: 0%; } 100% { top: 100%; } }
+    /* 페이지 레이어 등장(Wipe) 애니메이션 */
+    @keyframes wipe-down { 0% { clip-path: inset(0 0 100% 0); } 100% { clip-path: inset(0 0 0% 0); } }
+
+    /* [기능] 스캐닝 속도 분리 (오프닝은 2.5초로 묵직하게, 탭 이동은 1.0초로 쾌적하게) */
+    .scanning.slow .scanner-light { animation: light-down 2.5s linear forwards; }
+    .scanning.fast .scanner-light { animation: light-down 1.0s linear forwards; }
+    .page-layer.scanning.slow { animation: wipe-down 2.5s linear forwards; pointer-events: auto; }
+    .page-layer.scanning.fast { animation: wipe-down 1.0s linear forwards; pointer-events: auto; }
+
+    /* =========================================
+       3. 전역 UI 요소 (Global UI)
+       ========================================= */
+    /* 좌상단 글로벌 로고 (클릭 시 시스템 리부트) */
     #global-logo {
       position: fixed; top: 40px; left: 50px; font-size: 1.5rem; font-weight: 900;
       letter-spacing: 4px; cursor: pointer; z-index: 9999;
@@ -36,15 +58,34 @@
       color: var(--vivid-blue);
     }
     #global-logo:hover { opacity: 0.6; }
+    /* 배경색에 따른 로고 보호색 자동 전환 클래스 */
     #global-logo.theme-blue { color: var(--vivid-blue); }
     #global-logo.theme-black { color: var(--crt-dark); }
     #global-logo.theme-white { color: var(--bg-white); }
 
+    /* 초기 오프닝 화면 및 플래시 배경 */
     #start-screen {
       position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
       z-index: 60; transition: opacity 0.5s ease; background-color: var(--crt-dark);
     }
+    #exposure-bg {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: var(--vivid-blue); opacity: 0; z-index: 40; transition: opacity 0.2s ease;
+    }
+    #exposure-bg.exposed { opacity: 1; } /* 버튼 클릭 시 파란색으로 번쩍임 */
 
+    /* 스캐너 레이어 및 렌즈(빛줄기) */
+    #scanner-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 80; pointer-events: none; opacity: 0;
+    }
+    #scanner-overlay.scanning { opacity: 1; }
+    .scanner-light {
+      position: absolute; left: 0; width: 100%; height: 3px;
+      background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8); z-index: 10; top: 0%;
+    }
+
+    /* 공통 복고풍 버튼 스타일 */
     .retro-btn {
       background: transparent; color: var(--vivid-blue); border: 2px solid var(--vivid-blue); 
       padding: 12px 24px; font-size: 1rem; font-family: monospace; font-weight: bold;
@@ -54,58 +95,49 @@
     }
     .retro-btn:hover { background: var(--vivid-blue); color: var(--crt-dark); }
 
-    #exposure-bg {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: var(--vivid-blue); opacity: 0; z-index: 40; transition: opacity 0.2s ease;
+    /* [기능] 모든 페이지의 뒤로가기 버튼 하단 절대 고정 (마우스 간섭 방지) */
+    .btn-return, .btn-back-archive {
+      position: absolute !important; 
+      bottom: 5% !important; 
+      left: 50% !important;
+      transform: translateX(-50%) !important; 
+      z-index: 999 !important; 
     }
-    #exposure-bg.exposed { opacity: 1; }
+    /* 매거진 페이지 한정 흰색 버튼 강제 적용 */
+    #magazine-page .btn-return { color: var(--bg-white) !important; border-color: var(--bg-white) !important; }
+    #magazine-page .btn-return:hover { background: var(--bg-white) !important; color: var(--vivid-blue) !important; }
 
-    #scanner-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 80; pointer-events: none; opacity: 0;
-    }
-    #scanner-overlay.scanning { opacity: 1; }
-
-    .scanner-light {
-      position: absolute; left: 0; width: 100%; height: 3px;
-      background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8); z-index: 10; top: 0%;
-    }
-    
-    @keyframes light-down { 0% { top: 0%; } 100% { top: 100%; } }
-    @keyframes wipe-down { 0% { clip-path: inset(0 0 100% 0); } 100% { clip-path: inset(0 0 0% 0); } }
-
-    /* [수정] 스캐닝 애니메이션 속도 분리 (초기 오프닝 2.5초 / 내부 이동 1.0초) */
-    .scanning.slow .scanner-light { animation: light-down 2.5s linear forwards; }
-    .scanning.fast .scanner-light { animation: light-down 1.0s linear forwards; }
-
+    /* =========================================
+       4. 각 페이지 레이어 및 구조 (Page Layers)
+       ========================================= */
+    /* 공통 페이지 컨테이너 설정 */
     .page-layer {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       clip-path: inset(0 0 100% 0); z-index: 45;
     }
     
-    /* [수정] 레이어 현상 애니메이션 속도 분리 */
-    .page-layer.scanning.slow { animation: wipe-down 2.5s linear forwards; pointer-events: auto; }
-    .page-layer.scanning.fast { animation: wipe-down 1.0s linear forwards; pointer-events: auto; }
-
+    /* 각 페이지 배경색 지정 */
     #main-content { background-color: var(--bg-white); }
     #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     #members-page { background-color: var(--bg-white); color: var(--vivid-blue); }
     #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
 
-    .magazine-split-view {
-      display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative;
-    }
-    .mag-list-side {
-      flex: 1.2; display: flex; flex-direction: column; gap: 1.5rem;
-      border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px;
-    }
+    /* --- [1] 메인 메뉴 네비게이션 --- */
+    .menu-title { font-size: 5rem; font-weight: 900; text-transform: uppercase; letter-spacing: -2px; }
+    nav { display: flex; flex-direction: column; gap: 3rem; text-align: center; }
+    .menu-item { text-decoration: none; color: inherit; }
+
+    /* --- [2] 매거진 페이지 (스플릿 뷰) --- */
+    .magazine-split-view { display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative; }
+    .mag-list-side { flex: 1.2; display: flex; flex-direction: column; gap: 1.5rem; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px; }
     .mag-item { cursor: pointer; transition: all 0.5s ease; opacity: 0.3; display: flex; align-items: baseline; gap: 25px; }
     .mag-item:hover { opacity: 0.6; } 
     .mag-item.active { opacity: 1; transform: translateX(30px); }
     .mag-num { font-family: monospace; font-size: 1.2rem; font-weight: bold; }
     .mag-label { font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 900; margin: 0; line-height: 1; letter-spacing: -3px; text-transform: uppercase; }
     
+    /* 매거진 우측 이미지 및 텍스트 렌더링 박스 */
     .mag-preview-side { flex: 0.8; display: flex; justify-content: center; align-items: center; }
     #mag-display-box {
       width: clamp(250px, 20vw, 400px); aspect-ratio: 3/4; border: 1px solid var(--bg-white);
@@ -113,67 +145,61 @@
       box-shadow: 0 0 40px rgba(0,0,0,0.4); transition: all 0.6s ease;
       position: relative; overflow: hidden; padding: 40px; display: flex; align-items: flex-start; justify-content: center;
     }
-
+    /* 매니페스토 스크롤 텍스트 영역 */
     #mag-content-overlay {
-      width: 100%; height: 100%; overflow-y: auto; 
-      font-size: 1rem; line-height: 1.8; color: var(--bg-white);
-      text-align: justify; opacity: 0; transition: opacity 0.5s ease;
-      padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--bg-white) transparent;
-      pointer-events: auto; 
+      width: 100%; height: 100%; overflow-y: auto; font-size: 1rem; line-height: 1.8; color: var(--bg-white);
+      text-align: justify; opacity: 0; transition: opacity 0.5s ease; padding-right: 15px; 
+      scrollbar-width: thin; scrollbar-color: var(--bg-white) transparent; pointer-events: auto; 
     }
     #mag-content-overlay::-webkit-scrollbar { width: 4px; }
     #mag-content-overlay::-webkit-scrollbar-thumb { background: var(--bg-white); }
-    
-    #magazine-page .btn-return {
-      position: absolute !important; bottom: 5% !important; left: 50% !important;
-      transform: translateX(-50%) !important; z-index: 999 !important;
-      color: var(--bg-white) !important; border-color: var(--bg-white) !important;
-    }
 
-    .archive-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem;
-      width: 80%; max-width: 1100px; margin-bottom: 3rem;
-    }
+    /* --- [3] 아카이브 페이지 (그리드 뷰) --- */
+    .archive-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem; width: 80%; max-width: 1100px; margin-bottom: 3rem; }
     .leaflet-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .leaflet-cover {
       width: 100%; aspect-ratio: 3/4; border: 1px solid var(--vivid-blue);
       position: relative; display: flex; justify-content: center; align-items: center;
-      font-size: 2rem; font-weight: bold; transition: all 0.4s ease;
-      background-size: cover; background-position: center;
-      background-blend-mode: multiply; background-color: var(--vivid-blue);
-      color: var(--bg-white); text-shadow: 0 0 10px rgba(0,0,0,0.8);
+      font-size: 2rem; font-weight: bold; transition: all 0.4s ease; background-size: cover; background-position: center;
+      background-blend-mode: multiply; background-color: var(--vivid-blue); color: var(--bg-white); text-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
     .leaflet-item:hover .leaflet-cover { background-color: rgba(0, 51, 255, 0.8); transform: translateY(-5px); }
-
+    /* 아카이브 상세 모달 */
     .detail-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     .detail-container { display: flex; gap: 40px; width: 80%; max-width: 1000px; height: 60vh; align-items: center; }
     .detail-image-area { flex: 1; height: 100%; border: 1px solid var(--vivid-blue); background-size: contain; background-repeat: no-repeat; background-position: center; }
     .detail-text-area { flex: 1; text-align: left; }
 
-    .members-initial-grid {
-      position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
-      width: 80%; max-width: 900px; height: 60vh; margin: 0 auto;
-    }
+    /* --- [4] 멤버 페이지 (좌표계 그리드) --- */
+    .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 60vh; margin: 0 auto; }
+    /* 도면 십자선 효과 */
     .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
     .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
+    
     .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
     .member-initial { font-size: clamp(8rem, 15vw, 13rem); font-weight: 900; color: var(--vivid-blue); transition: all 0.5s ease; }
+    
+    /* 호버 시 텍스트 교차 등장 로직 */
     .members-initial-grid:hover .member-initial { opacity: 0; }
     .members-initial-grid .member-box:hover .member-initial { opacity: 1; transform: scale(1.1); }
+    /* 텍스트 박스는 마우스 이벤트(pointer-events)를 차단하여 Hitbox 간섭을 막음 */
     .member-detail { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.6s ease; }
     .detail-right { right: 0; padding-left: 60px; text-align: left; }
     .detail-left { left: 0; padding-right: 60px; text-align: right; }
     .member-box:hover .member-detail { opacity: 1; transform: translateX(0); }
 
-    .menu-title { font-size: 5rem; font-weight: 900; text-transform: uppercase; letter-spacing: -2px; }
-    nav { display: flex; flex-direction: column; gap: 3rem; text-align: center; }
-    .menu-item { text-decoration: none; color: inherit; }
 
+    /* =========================================
+       5. 반응형 웹 최적화 (Mobile UI)
+       ========================================= */
     @media (max-width: 768px) {
       .menu-title { font-size: 3.5rem; }
+      /* 매거진을 좌우에서 상하 분할로 변경 */
       .magazine-split-view { flex-direction: column; height: 75vh; }
       .mag-list-side { padding-left: 0; border-left: none; align-items: center; }
+      /* 아카이브 그리드를 4열에서 2열로 압축 */
       .archive-grid { grid-template-columns: repeat(2, 1fr); }
+      /* 멤버 그리드를 세로 1열로 나열 */
       .members-initial-grid { display: flex; flex-direction: column; }
     }
   </style>
@@ -255,6 +281,9 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      
+      /* 1. DOM 요소 캐싱 (메모리 최적화)
+         HTML 요소를 변수에 저장해두어 매번 문서를 뒤지는 부하를 줄임 */
       const dom = {
         start: document.getElementById('start-screen'),
         exposeBg: document.getElementById('exposure-bg'),
@@ -262,37 +291,49 @@
         logo: document.getElementById('global-logo')
       };
       
+      /* 2. 페이지 배열 자동 매핑 
+         HTML에 '.page-layer' 클래스가 있는 모든 DIV를 찾아 그 ID값으로 매핑.
+         차후 상세 페이지를 추가해도 JS를 수정할 필요 없이 자동 인식됨. */
       const pages = {};
       document.querySelectorAll('.page-layer').forEach(layer => pages[layer.id] = layer);
       
-      let currentPage = null, isAnimating = false;
+      let currentPage = null; 
+      let isAnimating = false; // 애니메이션 중 중복 클릭을 막는 방어벽 변수
 
-      // [수정] 속도를 인자로 받는 네비게이션 함수 ('fast' 기본값, 오프닝은 'slow')
+      /* 3. 코어 네비게이션 엔진 (이동 및 스캔 연출)
+         @param {string} targetId - 이동할 HTML 요소의 ID
+         @param {string} speed - 스캔 애니메이션 속도 ('fast' 1.0초 / 'slow' 2.5초) */
       function navigateTo(targetId, speed = 'fast') {
         const target = pages[targetId];
+        
+        // 유효하지 않은 타겟이거나 애니메이션 진행 중이면 작동 무시
         if (isAnimating || currentPage === target || !target) return;
+        
         isAnimating = true;
-        document.body.style.pointerEvents = 'none';
+        document.body.style.pointerEvents = 'none'; // 스캔 중 마우스 간섭 원천 차단
 
-        // 속도에 따른 대기 시간 산정 (slow=2.5초, fast=1.0초)
         const duration = speed === 'slow' ? 2500 : 1000;
 
+        // 도착할 페이지 배경색에 따라 CYANO 로고 보호색 전환
         if (targetId === 'main-content' || targetId === 'members-page') dom.logo.className = 'theme-black';
         else if (targetId === 'magazine-page') dom.logo.className = 'theme-white';
         else dom.logo.className = 'theme-blue';
 
-        // 스캐너 초기화 및 속도 클래스 적용
+        // 스캐너 초기화 및 재실행 (Reflow 기법)
         dom.scanner.classList.remove('scanning', 'fast', 'slow');
-        void dom.scanner.offsetWidth; 
+        void dom.scanner.offsetWidth; // 브라우저에 변경사항을 즉시 강제 반영함
         dom.scanner.classList.add('scanning', speed);
 
+        // 레이어 계층(z-index) 재배치
         if (currentPage) currentPage.style.zIndex = 45;
         target.style.zIndex = 55;
         
+        // 도착할 페이지 현상(Wipe) 애니메이션 트리거
         target.classList.remove('scanning', 'fast', 'slow');
         void target.offsetWidth;
         target.classList.add('scanning', speed);
 
+        // 스캔 시간이 끝난 뒤 실행되는 콜백 (청소 작업 및 권한 복구)
         setTimeout(() => {
           Object.values(pages).forEach(p => { 
             if (p !== target) { 
@@ -301,21 +342,26 @@
             } 
           });
           isAnimating = false;
-          document.body.style.pointerEvents = 'auto';
+          document.body.style.pointerEvents = 'auto'; // 마우스 컨트롤 권한 반환
         }, duration);
         
         currentPage = target;
 
+        // 매거진 진입 시 항상 첫 번째 항목(00번)이 렌더링되도록 강제
         if (targetId === 'magazine-page') updateMagDisplay(0);
       }
 
+      /* 4. 전역 로고 리부트 시스템 (오프닝 화면으로 회귀) */
       dom.logo.addEventListener('click', () => {
         if (!currentPage || isAnimating) return;
         isAnimating = true;
+        
         dom.start.style.opacity = '1';
         dom.start.style.pointerEvents = 'auto';
         dom.exposeBg.classList.remove('exposed');
         dom.logo.className = 'theme-blue';
+        
+        // 0.5초 동안 어두운 화면이 덮인 후 백그라운드 레이어 초기화
         setTimeout(() => {
           Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
           currentPage = null; 
@@ -323,54 +369,69 @@
         }, 500);
       });
 
-      // [수정] 초기 진입 시에만 'slow' 모드로 스캐닝 실행
+      /* 5. 최초 스캔 버튼 이벤트 (Slow 스캔 적용) */
       document.getElementById('expose-btn').addEventListener('click', () => {
         dom.start.style.opacity = '0'; 
         dom.start.style.pointerEvents = 'none';
-        dom.exposeBg.classList.add('exposed');
-        setTimeout(() => navigateTo('main-content', 'slow'), 400);
+        dom.exposeBg.classList.add('exposed'); // 파란 섬광 효과
+        setTimeout(() => navigateTo('main-content', 'slow'), 400); // 0.4초 딜레이 후 메인 메뉴로
       });
 
-      // 나머지 내부 탭 이동은 모두 'fast' (1.0초) 모드로 작동
+      /* 6. 공통 이벤트 리스너 반복 할당 
+         각각의 버튼에 코드를 달지 않고, HTML의 data-target 속성을 읽어와 자동으로 연결함 */
       document.querySelectorAll('.menu-item, .leaflet-item').forEach(el => {
-        el.addEventListener('click', (e) => { e.preventDefault(); navigateTo(el.dataset.target); });
+        el.addEventListener('click', (e) => { 
+          e.preventDefault(); 
+          navigateTo(el.dataset.target); // 속성값을 읽어 타겟팅
+        });
       });
 
       document.querySelectorAll('.btn-return').forEach(btn => btn.addEventListener('click', () => navigateTo('main-content')));
       document.querySelectorAll('.btn-back-archive').forEach(btn => btn.addEventListener('click', () => navigateTo('archive-page')));
 
-      // 매거진 로직
+      /* 7. 매거진 컨텐츠 렌더링 엔진 */
       const magItems = document.querySelectorAll('.mag-item');
       const magDisplay = {
         box: document.getElementById('mag-display-box'),
         overlay: document.getElementById('mag-content-overlay')
       };
-      let magTimeout;
+      let magTimeout; // 레이스 컨디션(동시 클릭 시 오류) 방어막
 
       function updateMagDisplay(index) {
+        // 모든 리스트의 활성화 상태 초기화 후 클릭한 것만 켬
         magItems.forEach(item => item.classList.remove('active'));
         magItems[index].classList.add('active');
         
+        // 클릭한 항목에 숨겨진 이미지 URL과 텍스트 데이터를 추출
         const imgUrl = magItems[index].dataset.img;
         const textData = magItems[index].querySelector('.mag-text-data');
         
+        // 트랜지션을 위해 투명도를 0으로 내림
         magDisplay.box.style.opacity = '0';
         magDisplay.overlay.style.opacity = '0';
         
+        /* [핵심] clearTimeout: 
+           사용자가 항목을 매우 빠르게 여러 번 눌렀을 때, 
+           이전의 현상 예약 명령을 취소하고 마지막 명령만 실행되도록 통제함 */
         clearTimeout(magTimeout);
         magTimeout = setTimeout(() => {
+          // 배경에 추출한 이미지 교체
           magDisplay.box.style.backgroundImage = `url(${imgUrl})`;
+          
           if (textData) {
+            // 숨겨진 텍스트 데이터가 있다면 오버레이에 주입
             magDisplay.overlay.innerHTML = textData.innerHTML;
             magDisplay.overlay.style.opacity = '1';
-            magDisplay.overlay.scrollTop = 0; 
+            magDisplay.overlay.scrollTop = 0; // 이전 스크롤 내역 초기화
           } else {
-            magDisplay.overlay.innerHTML = "";
+            magDisplay.overlay.innerHTML = ""; // 이미지 전용 항목일 경우 비움
           }
+          // 페이드 인
           magDisplay.box.style.opacity = '1';
-        }, 200);
+        }, 200); // 0.2초 딜레이 (자연스러운 페이드 효과 연출)
       }
 
+      // 리스트 클릭 시 렌더링 함수 실행
       magItems.forEach((item, idx) => item.addEventListener('click', () => updateMagDisplay(idx)));
     });
   </script>

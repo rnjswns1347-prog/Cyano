@@ -109,10 +109,63 @@
     #members-page { background-color: var(--bg-white); color: var(--vivid-blue); }
     #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
 
-    /* --- 메인 메뉴 --- */
-    .menu-title { font-size: 5rem; font-weight: 900; text-transform: uppercase; letter-spacing: -2px; }
-    nav { display: flex; flex-direction: column; gap: 3rem; text-align: center; }
-    .menu-item { text-decoration: none; color: inherit; }
+    /* --- [핵심] 키네틱 메가 타이포 메뉴 --- */
+    nav { 
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      width: 100vw; height: 100vh; overflow: hidden; gap: 0; 
+    }
+    .menu-item { 
+      flex: 1; 
+      width: 100vw; position: relative; cursor: pointer;
+      display: flex; align-items: center; justify-content: flex-start;
+      text-decoration: none; color: inherit; overflow: hidden;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, filter 0.4s ease;
+      transform-origin: center;
+    }
+
+    .menu-title.primary { 
+      font-size: 21vw; font-weight: 900; text-transform: uppercase; margin: 0;
+      line-height: 0.75; letter-spacing: -0.04em; white-space: nowrap;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: absolute; z-index: 2;
+    }
+
+    /* 슬라이드 띠 기본 설정 */
+    .marquee-track {
+      position: absolute; left: 0; display: flex; opacity: 0;
+      width: max-content; transition: opacity 0.3s ease;
+      animation: slide-marquee 25s linear infinite paused; 
+      will-change: transform;
+    }
+    .menu-item.reverse .marquee-track { animation-name: slide-marquee-reverse; }
+
+    .marquee-half { display: flex; gap: 4vw; padding-right: 4vw; }
+    .marquee-text { 
+      font-size: 22vw; font-weight: 900; text-transform: uppercase; margin: 0; 
+      line-height: 0.75; letter-spacing: -0.04em; white-space: nowrap;
+    }
+    .marquee-text.outline { color: transparent; -webkit-text-stroke: 4px var(--vivid-blue); }
+
+    @keyframes slide-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    @keyframes slide-marquee-reverse { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
+
+    /* ==== [데스크톱 환경 전용] 마우스 호버 효과 ==== */
+    @media (hover: hover) and (pointer: fine) {
+      nav:has(.menu-item:hover) .menu-item:not(:hover) { 
+        opacity: 0.15; filter: blur(8px); transform: scale(0.98);
+      }
+      .menu-item:hover { transform: scale(1.05); z-index: 10; }
+      .menu-item:hover .menu-title.primary { opacity: 0; transform: scale(1.1); }
+      .menu-item:hover .marquee-track { opacity: 1; animation-play-state: running; }
+    }
+
+    /* ==== [공통] 클릭(터치) 시 포커스 고정 효과 ==== */
+    /* 스캐닝 애니메이션(1초) 동안 흐려짐과 선택 상태를 억지로 유지시킴 */
+    nav.nav-locked .menu-item:not(.item-locked) { opacity: 0.15; filter: blur(8px); transform: scale(0.95); }
+    .menu-item.item-locked { transform: scale(1.05); z-index: 10; }
+    .menu-item.item-locked .menu-title.primary { opacity: 0; transform: scale(1.1); }
+    .menu-item.item-locked .marquee-track { opacity: 1; animation-play-state: running; }
+
 
     /* --- 매거진 스플릿 뷰 --- */
     .magazine-split-view { display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative; }
@@ -169,7 +222,6 @@
     .detail-left { left: 0; padding-right: 60px; text-align: right; }
     .member-box:hover .member-detail { opacity: 1; transform: translateX(0); }
 
-    /* 멤버 상세 텍스트 타이포그래피 */
     .detail-role { font-family: monospace; letter-spacing: 2px; opacity: 0.6; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
     .detail-name { font-size: 3rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; line-height: 1; }
     .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
@@ -178,12 +230,21 @@
        5. 반응형 웹 최적화 (Mobile UI 대폭 강화)
        ========================================= */
     @media (max-width: 768px) {
-      /* 전역 및 네비게이션 */
       #global-logo { top: 20px; left: 20px; font-size: 1.1rem; }
-      .menu-title { font-size: 3rem; }
-      nav { gap: 2rem; }
+      nav { gap: 0; }
+      
+      /* [모바일 전용] 터치 전에도 무조건 텍스트가 흘러가게 만듦 */
+      .menu-title.primary { opacity: 0 !important; }
+      .marquee-track { opacity: 1 !important; animation-play-state: running !important; }
 
-      /* 1. 매거진 페이지 (상하 배치 및 텍스트 상자 비율 최적화) */
+      /* 터치 즉각 반응 효과 */
+      nav:active .menu-item:not(:active) { opacity: 0.15; filter: blur(8px); transform: scale(0.95); }
+      .menu-item:active { transform: scale(1.05); z-index: 10; }
+
+      .marquee-text { font-size: 30vw; }
+      .marquee-half { gap: 8vw; padding-right: 8vw; }
+      .marquee-text.outline { -webkit-text-stroke: 2px var(--vivid-blue); }
+
       .magazine-split-view { flex-direction: column; height: 80vh; justify-content: flex-start; gap: 1rem; margin-top: 50px; }
       .mag-list-side { flex: none; width: 100%; border-left: none; padding-left: 0; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px; align-items: center; }
       .mag-label { font-size: 2.2rem; }
@@ -191,18 +252,15 @@
       #mag-display-box { width: 85%; padding: 20px; height: 45vh; }
       #mag-content-overlay { font-size: 0.9rem; }
 
-      /* 2. 아카이브 페이지 (그리드 간격 축소 및 상세 페이지 상하 분할) */
       .archive-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 90%; margin-bottom: 4rem; }
       .page-title { font-size: 2rem !important; margin-bottom: 1rem; margin-top: 30px; }
       
-      /* 상세 페이지 (좌우 -> 상하) */
       .detail-container { flex-direction: column; height: 75vh; gap: 15px; padding-top: 40px; }
       .detail-image-area { min-height: 45%; width: 100%; }
       .detail-text-area { text-align: center; justify-content: flex-start; overflow-y: auto; padding-bottom: 20px; }
       .detail-text-area h2 { font-size: 2rem; margin-bottom: 10px; }
       .detail-text-area p { font-size: 0.95rem; }
 
-      /* 3. 멤버 페이지 (터치 환경에 맞춘 리스트형 전환) */
       .members-initial-grid { display: flex; flex-direction: column; height: 75vh; overflow-y: auto; gap: 2.5rem; padding-top: 40px; width: 90%; }
       .grid-crosshair-x, .grid-crosshair-y { display: none; } 
       
@@ -216,7 +274,6 @@
       .detail-name { font-size: 2.2rem; margin-bottom: 10px; }
       .detail-manifesto { font-size: 0.95rem; }
 
-      /* 4. 하단 탈출 버튼 (크기 축소 및 위치 보정) */
       .btn-return, .btn-back-archive { bottom: 2% !important; font-size: 0.8rem; padding: 10px 16px; white-space: nowrap; }
     }
   </style>
@@ -232,9 +289,47 @@
 
   <div id="main-content" class="page-layer">
     <nav>
-      <a href="#" class="menu-item" data-target="magazine-page"><h1 class="menu-title">Magazine</h1></a>
-      <a href="#" class="menu-item" data-target="archive-page"><h1 class="menu-title">Archive</h1></a>
-      <a href="#" class="menu-item" data-target="members-page"><h1 class="menu-title">Members</h1></a>
+      <a href="#" class="menu-item" data-target="magazine-page">
+        <h1 class="menu-title primary">Magazine</h1>
+        <div class="marquee-track">
+          <div class="marquee-half">
+            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
+            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
+          </div>
+          <div class="marquee-half">
+            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
+            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
+          </div>
+        </div>
+      </a>
+      
+      <a href="#" class="menu-item reverse" data-target="archive-page">
+        <h1 class="menu-title primary">Archive</h1>
+        <div class="marquee-track">
+          <div class="marquee-half">
+            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
+            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
+          </div>
+          <div class="marquee-half">
+            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
+            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
+          </div>
+        </div>
+      </a>
+      
+      <a href="#" class="menu-item" data-target="members-page">
+        <h1 class="menu-title primary">Members</h1>
+        <div class="marquee-track">
+          <div class="marquee-half">
+            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
+            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
+          </div>
+          <div class="marquee-half">
+            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
+            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
+          </div>
+        </div>
+      </a>
     </nav>
   </div>
 
@@ -345,6 +440,15 @@
       let currentPage = null; 
       let isAnimating = false; 
 
+      // 상태 초기화 함수
+      function resetNavLock() {
+        const nav = document.querySelector('nav');
+        if(nav) {
+          nav.classList.remove('nav-locked');
+          nav.querySelectorAll('.menu-item').forEach(i => i.classList.remove('item-locked'));
+        }
+      }
+
       function navigateTo(targetId, speed = 'fast') {
         const target = pages[targetId];
         if (isAnimating || currentPage === target || !target) return;
@@ -398,6 +502,7 @@
           Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
           currentPage = null; 
           isAnimating = false;
+          resetNavLock(); // 로고 클릭 시 메뉴 잠금 초기화
         }, 500);
       });
 
@@ -411,11 +516,21 @@
       document.querySelectorAll('.menu-item, .leaflet-item').forEach(el => {
         el.addEventListener('click', (e) => { 
           e.preventDefault(); 
+          
+          // 메뉴 클릭 시, 화면 전환되는 1초 동안 흐려짐/선택 상태를 강제 고정함
+          if (el.classList.contains('menu-item')) {
+            el.closest('nav').classList.add('nav-locked');
+            el.classList.add('item-locked');
+          }
+          
           navigateTo(el.dataset.target); 
         });
       });
 
-      document.querySelectorAll('.btn-return').forEach(btn => btn.addEventListener('click', () => navigateTo('main-content')));
+      document.querySelectorAll('.btn-return').forEach(btn => btn.addEventListener('click', () => {
+        resetNavLock(); // 뒤로가기 누를 때 메뉴 잠금 해제
+        navigateTo('main-content');
+      }));
       document.querySelectorAll('.btn-back-archive').forEach(btn => btn.addEventListener('click', () => navigateTo('archive-page')));
 
       const magItems = document.querySelectorAll('.mag-item');

@@ -109,172 +109,113 @@
     #members-page { background-color: var(--bg-white); color: var(--vivid-blue); }
     #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
 
-    /* --- [핵심] 키네틱 메가 타이포 메뉴 --- */
-    nav { 
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      width: 100vw; height: 100vh; overflow: hidden; gap: 0; 
-    }
-    .menu-item { 
-      flex: 1; 
-      width: 100vw; position: relative; cursor: pointer;
-      display: flex; align-items: center; justify-content: flex-start;
-      text-decoration: none; color: inherit; overflow: hidden;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, filter 0.4s ease;
-      transform-origin: center;
-    }
-
-    .menu-title.primary { 
-      font-size: 21vw; font-weight: 900; text-transform: uppercase; margin: 0;
-      line-height: 0.75; letter-spacing: -0.04em; white-space: nowrap;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      position: absolute; z-index: 2;
-    }
-
-    /* 슬라이드 띠 기본 설정 */
-    .marquee-track {
-      position: absolute; left: 0; display: flex; opacity: 0;
-      width: max-content; transition: opacity 0.3s ease;
-      animation: slide-marquee 25s linear infinite paused; 
-      will-change: transform;
-    }
+    /* --- 메인 메뉴 --- */
+    nav { display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100vw; height: 100vh; overflow: hidden; gap: 0; }
+    .menu-item { flex: 1; width: 100vw; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: flex-start; text-decoration: none; color: inherit; overflow: hidden; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, filter 0.4s ease; transform-origin: center; }
+    .menu-title.primary { font-size: 21vw; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 0.75; letter-spacing: -0.04em; white-space: nowrap; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: absolute; z-index: 2; }
+    .marquee-track { position: absolute; left: 0; display: flex; opacity: 0; width: max-content; transition: opacity 0.3s ease; animation: slide-marquee 25s linear infinite paused; will-change: transform; }
     .menu-item.reverse .marquee-track { animation-name: slide-marquee-reverse; }
-
     .marquee-half { display: flex; gap: 4vw; padding-right: 4vw; }
-    .marquee-text { 
-      font-size: 22vw; font-weight: 900; text-transform: uppercase; margin: 0; 
-      line-height: 0.75; letter-spacing: -0.04em; white-space: nowrap;
-    }
+    .marquee-text { font-size: 22vw; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 0.75; letter-spacing: -0.04em; white-space: nowrap; }
     .marquee-text.outline { color: transparent; -webkit-text-stroke: 4px var(--vivid-blue); }
-
     @keyframes slide-marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
     @keyframes slide-marquee-reverse { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
 
-    /* ==== [데스크톱 환경 전용] 마우스 호버 효과 ==== */
     @media (hover: hover) and (pointer: fine) {
-      nav:has(.menu-item:hover) .menu-item:not(:hover) { 
-        opacity: 0.15; filter: blur(8px); transform: scale(0.98);
-      }
+      nav:has(.menu-item:hover) .menu-item:not(:hover) { opacity: 0.15; filter: blur(8px); transform: scale(0.98); }
       .menu-item:hover { transform: scale(1.05); z-index: 10; }
       .menu-item:hover .menu-title.primary { opacity: 0; transform: scale(1.1); }
       .menu-item:hover .marquee-track { opacity: 1; animation-play-state: running; }
     }
-
-    /* ==== [공통] 클릭(터치) 시 포커스 고정 효과 ==== */
-    /* 스캐닝 애니메이션(1초) 동안 흐려짐과 선택 상태를 억지로 유지시킴 */
     nav.nav-locked .menu-item:not(.item-locked) { opacity: 0.15; filter: blur(8px); transform: scale(0.95); }
     .menu-item.item-locked { transform: scale(1.05); z-index: 10; }
     .menu-item.item-locked .menu-title.primary { opacity: 0; transform: scale(1.1); }
     .menu-item.item-locked .marquee-track { opacity: 1; animation-play-state: running; }
 
-
-    /* --- 매거진 스플릿 뷰 --- */
+    /* --- 매거진 스플릿 뷰 & 드롭다운 구조 --- */
     .magazine-split-view { display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative; }
-    .mag-list-side { flex: 1.2; display: flex; flex-direction: column; gap: 1.5rem; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px; }
+    .mag-list-side { flex: 1.2; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px; position: relative; }
+    .mag-mobile-toggle { display: none; } 
+    .mag-list-items { display: flex; flex-direction: column; gap: 1.5rem; }
     .mag-item { cursor: pointer; transition: all 0.5s ease; opacity: 0.3; display: flex; align-items: baseline; gap: 25px; }
     .mag-item:hover { opacity: 0.6; } 
     .mag-item.active { opacity: 1; transform: translateX(30px); }
     .mag-num { font-family: monospace; font-size: 1.2rem; font-weight: bold; }
     .mag-label { font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 900; margin: 0; line-height: 1; letter-spacing: -3px; text-transform: uppercase; }
-    
     .mag-preview-side { flex: 0.8; display: flex; justify-content: center; align-items: center; }
-    #mag-display-box {
-      width: clamp(250px, 20vw, 400px); aspect-ratio: 3/4; border: 1px solid var(--bg-white);
-      background-size: cover; background-position: center; background-color: rgba(255,255,255,0.05);
-      box-shadow: 0 0 40px rgba(0,0,0,0.4); transition: all 0.6s ease;
-      position: relative; overflow: hidden; padding: 40px; display: flex; align-items: flex-start; justify-content: center;
-    }
-    #mag-content-overlay {
-      width: 100%; height: 100%; overflow-y: auto; font-size: 1rem; line-height: 1.8; color: var(--bg-white);
-      text-align: justify; opacity: 0; transition: opacity 0.5s ease; padding-right: 15px; 
-      scrollbar-width: thin; scrollbar-color: var(--bg-white) transparent; pointer-events: auto; 
-    }
+    #mag-display-box { width: clamp(250px, 20vw, 400px); aspect-ratio: 3/4; border: 1px solid var(--bg-white); background-size: cover; background-position: center; background-color: rgba(255,255,255,0.05); box-shadow: 0 0 40px rgba(0,0,0,0.4); transition: all 0.6s ease; position: relative; overflow: hidden; padding: 40px; display: flex; align-items: flex-start; justify-content: center; }
+    #mag-content-overlay { width: 100%; height: 100%; overflow-y: auto; font-size: 1rem; line-height: 1.8; color: var(--bg-white); text-align: justify; opacity: 0; transition: opacity 0.5s ease; padding-right: 15px; scrollbar-width: thin; scrollbar-color: var(--bg-white) transparent; pointer-events: auto; }
     #mag-content-overlay::-webkit-scrollbar { width: 4px; }
     #mag-content-overlay::-webkit-scrollbar-thumb { background: var(--bg-white); }
 
-    /* --- 아카이브 그리드 뷰 --- */
+    /* --- 아카이브 및 멤버 페이지 유지 --- */
     .archive-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5rem; width: 80%; max-width: 1100px; margin-bottom: 3rem; }
     .leaflet-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-    .leaflet-cover {
-      width: 100%; aspect-ratio: 3/4; border: 1px solid var(--vivid-blue);
-      position: relative; display: flex; justify-content: center; align-items: center;
-      font-size: 2rem; font-weight: bold; transition: all 0.4s ease; background-size: cover; background-position: center;
-      background-blend-mode: multiply; background-color: var(--vivid-blue); color: var(--bg-white); text-shadow: 0 0 10px rgba(0,0,0,0.8);
-    }
+    .leaflet-cover { width: 100%; aspect-ratio: 3/4; border: 1px solid var(--vivid-blue); position: relative; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: bold; transition: all 0.4s ease; background-size: cover; background-position: center; background-blend-mode: multiply; background-color: var(--vivid-blue); color: var(--bg-white); text-shadow: 0 0 10px rgba(0,0,0,0.8); }
     .leaflet-item:hover .leaflet-cover { background-color: rgba(0, 51, 255, 0.8); transform: translateY(-5px); }
-    
     .detail-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     .detail-container { display: flex; gap: 40px; width: 80%; max-width: 1000px; height: 60vh; align-items: center; }
     .detail-image-area { flex: 1; height: 100%; border: 1px solid var(--vivid-blue); background-size: contain; background-repeat: no-repeat; background-position: center; }
     .detail-text-area { flex: 1; text-align: left; }
-
-    /* --- 멤버 페이지 (좌표계 뷰) --- */
     .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 60vh; margin: 0 auto; }
     .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
     .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
-    
     .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
     .member-initial { font-size: clamp(8rem, 15vw, 13rem); font-weight: 900; color: var(--vivid-blue); transition: all 0.5s ease; }
-    
     .members-initial-grid:hover .member-initial { opacity: 0; }
     .members-initial-grid .member-box:hover .member-initial { opacity: 1; transform: scale(1.1); }
     .member-detail { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.6s ease; }
     .detail-right { right: 0; padding-left: 60px; text-align: left; }
     .detail-left { left: 0; padding-right: 60px; text-align: right; }
     .member-box:hover .member-detail { opacity: 1; transform: translateX(0); }
-
     .detail-role { font-family: monospace; letter-spacing: 2px; opacity: 0.6; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
     .detail-name { font-size: 3rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; line-height: 1; }
     .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
 
     /* =========================================
-       5. 반응형 웹 최적화 (Mobile UI 대폭 강화)
+       5. 반응형 웹 최적화 (Mobile UI)
        ========================================= */
     @media (max-width: 768px) {
       #global-logo { top: 20px; left: 20px; font-size: 1.1rem; }
       nav { gap: 0; }
-      
-      /* [모바일 전용] 터치 전에도 무조건 텍스트가 흘러가게 만듦 */
       .menu-title.primary { opacity: 0 !important; }
       .marquee-track { opacity: 1 !important; animation-play-state: running !important; }
-
-      /* 터치 즉각 반응 효과 */
       nav:active .menu-item:not(:active) { opacity: 0.15; filter: blur(8px); transform: scale(0.95); }
       .menu-item:active { transform: scale(1.05); z-index: 10; }
-
       .marquee-text { font-size: 30vw; }
       .marquee-half { gap: 8vw; padding-right: 8vw; }
       .marquee-text.outline { -webkit-text-stroke: 2px var(--vivid-blue); }
 
-      .magazine-split-view { flex-direction: column; height: 80vh; justify-content: flex-start; gap: 1rem; margin-top: 50px; }
-      .mag-list-side { flex: none; width: 100%; border-left: none; padding-left: 0; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px; align-items: center; }
-      .mag-label { font-size: 2.2rem; }
-      .mag-item.active { transform: translateY(-5px); } 
-      #mag-display-box { width: 85%; padding: 20px; height: 45vh; }
+      .magazine-split-view { flex-direction: column; height: 80vh; justify-content: flex-start; gap: 0; margin-top: 10vh; }
+      .mag-list-side { width: 85%; padding-left: 0; border-left: none; position: relative; z-index: 30; }
+      .mag-mobile-toggle { display: block; padding: 12px; border: 1px solid var(--bg-white); color: var(--bg-white); font-family: monospace; font-size: 1.1rem; text-align: center; cursor: pointer; background: var(--vivid-blue); transition: all 0.3s ease; letter-spacing: 1px; }
+      .mag-list-items { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--vivid-blue); border: 1px solid var(--bg-white); border-top: none; padding: 20px; box-sizing: border-box; flex-direction: column; gap: 1.5rem; max-height: 50vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+      .mag-list-side.open .mag-list-items { display: flex; }
+      .mag-list-side.open .mag-mobile-toggle { background: var(--bg-white); color: var(--vivid-blue); font-weight: bold; }
+      .mag-label { font-size: 2rem; }
+      .mag-item.active { transform: translateX(15px); } 
+
+      .mag-preview-side { flex: 1; width: 100%; margin-top: 20px; display: flex; align-items: flex-start; }
+      #mag-display-box { width: 90%; height: 55vh; max-height: 55vh; padding: 25px; }
       #mag-content-overlay { font-size: 0.9rem; }
+      .btn-return, .btn-back-archive { bottom: 3% !important; font-size: 0.8rem; padding: 10px 16px; }
 
       .archive-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; width: 90%; margin-bottom: 4rem; }
       .page-title { font-size: 2rem !important; margin-bottom: 1rem; margin-top: 30px; }
-      
       .detail-container { flex-direction: column; height: 75vh; gap: 15px; padding-top: 40px; }
       .detail-image-area { min-height: 45%; width: 100%; }
       .detail-text-area { text-align: center; justify-content: flex-start; overflow-y: auto; padding-bottom: 20px; }
       .detail-text-area h2 { font-size: 2rem; margin-bottom: 10px; }
       .detail-text-area p { font-size: 0.95rem; }
-
       .members-initial-grid { display: flex; flex-direction: column; height: 75vh; overflow-y: auto; gap: 2.5rem; padding-top: 40px; width: 90%; }
       .grid-crosshair-x, .grid-crosshair-y { display: none; } 
-      
       .member-box { flex-direction: column; width: 100%; position: relative; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed rgba(0, 51, 255, 0.3); }
       .member-box:last-child { border-bottom: none; }
-      
       .member-initial { font-size: 4rem; opacity: 1; text-align: center; margin-bottom: 5px; } 
       .members-initial-grid:hover .member-initial { opacity: 1; } 
-      
       .member-detail { position: relative; opacity: 1; pointer-events: auto; width: 100%; transform: none !important; padding: 0 !important; text-align: center !important; }
       .detail-name { font-size: 2.2rem; margin-bottom: 10px; }
       .detail-manifesto { font-size: 0.95rem; }
-
-      .btn-return, .btn-back-archive { bottom: 2% !important; font-size: 0.8rem; padding: 10px 16px; white-space: nowrap; }
     }
   </style>
 </head>
@@ -292,42 +233,22 @@
       <a href="#" class="menu-item" data-target="magazine-page">
         <h1 class="menu-title primary">Magazine</h1>
         <div class="marquee-track">
-          <div class="marquee-half">
-            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
-            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
-          </div>
-          <div class="marquee-half">
-            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
-            <span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span>
-          </div>
+          <div class="marquee-half"><span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span><span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span></div>
+          <div class="marquee-half"><span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span><span class="marquee-text outline">Magazine</span><span class="marquee-text">Magazine</span></div>
         </div>
       </a>
-      
       <a href="#" class="menu-item reverse" data-target="archive-page">
         <h1 class="menu-title primary">Archive</h1>
         <div class="marquee-track">
-          <div class="marquee-half">
-            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
-            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
-          </div>
-          <div class="marquee-half">
-            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
-            <span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span>
-          </div>
+          <div class="marquee-half"><span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span><span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span></div>
+          <div class="marquee-half"><span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span><span class="marquee-text outline">Archive</span><span class="marquee-text">Archive</span></div>
         </div>
       </a>
-      
       <a href="#" class="menu-item" data-target="members-page">
         <h1 class="menu-title primary">Members</h1>
         <div class="marquee-track">
-          <div class="marquee-half">
-            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
-            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
-          </div>
-          <div class="marquee-half">
-            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
-            <span class="marquee-text outline">Members</span><span class="marquee-text">Members</span>
-          </div>
+          <div class="marquee-half"><span class="marquee-text outline">Members</span><span class="marquee-text">Members</span><span class="marquee-text outline">Members</span><span class="marquee-text">Members</span></div>
+          <div class="marquee-half"><span class="marquee-text outline">Members</span><span class="marquee-text">Members</span><span class="marquee-text outline">Members</span><span class="marquee-text">Members</span></div>
         </div>
       </a>
     </nav>
@@ -336,26 +257,29 @@
   <div id="magazine-page" class="page-layer">
     <div class="magazine-split-view">
       <div class="mag-list-side">
-        <div class="mag-item active" data-img="manifesto_bg.jpg">
-          <span class="mag-num">00</span><h2 class="mag-label">MANIFESTO</h2>
-          <div class="mag-text-data" style="display:none;">
-            <p style="margin-top:0;"><b>&lt;도면을 펼친 여러분께&gt;</b></p>
-            <p>태어난 모든 인간은 자유롭다고, 우리는 배웁니다. 모두가 사과나무에 오를 수는 없을지라도, 사과를 꿈꾸는 마음만큼은 모두가 평등하게 가질 수 있는 거니까요.</p>
-            <p>하지만 조금만 멀리서 보게 된다면, 우리가 내리는 선택이 결국은 이미 준비된 선택지 안에서 이루어진다는 걸 깨닫게 됩니다. 세상은 언제나 우리에게 순응을 요구합니다. 태어날 때 주어진 유전자의 명령부터, 사회가 덧씌운 정상성과 효율성이라는 견고한 레이아웃까지 말입니다. 우리는 그 푸른 종이 위에 그려진 선을 따라 걷는 것이 인생이라 배웠고, 그 궤도에서 이탈하는 것을 결함이라 명명해 왔습니다.</p>
-            <p>그래서 우리는 묶이기 쉬운 시대에 살고 있나 봅니다. 다름이 죄이고, 모난 돌에 정을 때리는 세계에서, 정해진 프리셋은 우리가 숨을 곳을 남겨주니까요.</p>
-            <p>하지만 저는 묻고 싶습니다. 신체라는 외골격에 갇혀, 7개 남짓한 구멍으로 세상을 관측하는 우리가 정말로 그 도면의 의도를 온전히 이해하고 있는 것일까요? 인간은 말랑말랑한 로봇입니다. 우리가 '나의 의지'라고 믿었던 선택들이 사실은 미리 준비된 프리셋(Preset) 중 하나에 불과하다면, 우리는 이 짜여진 판 속에서 어떤 표정을 지어야 할까요?</p>
-            <p>매거진 &lt;시아노타입&gt;은 이 질문에서 시작되었습니다. 우리는 이미 그려진 운명을 무시할 만큼 오만하지 않습니다. 다만, <b>둘둘 말아 구석에 치워두었던 파란 종이 뭉치를 다시 펼쳐보려 합니다.</b> 구조를 똑바로 파악하고, 그 선들이 어디로 연결되는지 집요하게 추적하는 것. 그것이 저희가 하는 일입니다.</p>
-            <p>이제, 우리는 설계도의 여백에 주석을 달기 시작합니다.</p>
-            <p>계속 불안에 떨어야 할까요? 아니면 다 같이 웃고 즐기면 그만일까요? 외부 세계를 깨달은 시점에서 내부의 존재들은 딜레마에 빠집니다. 순응할까, 저항할까? 우리는 이 설계도를 똑바로 바라보고 구조를 파악해 보려 합니다. 혹시 모릅니다. 결함을 찾아낸다면, 자가 수리가 가능할지도!</p>
-            <p>우리는 역설계를 시도합니다.<br>이번 시아노타입의 창간호 주제는 <b>&lt;청사진:인간설계도&gt;</b>입니다.</p>
-            <p style="text-align:right; margin-top:20px;">편집장 拜</p>
+        <div id="mag-mobile-toggle" class="mag-mobile-toggle" data-default-text="[ 00_MANIFESTO ▾ ]">[ 00_MANIFESTO ▾ ]</div>
+        <div class="mag-list-items">
+          <div class="mag-item active" data-img="manifesto_bg.jpg">
+            <span class="mag-num">00</span><h2 class="mag-label">MANIFESTO</h2>
+            <div class="mag-text-data" style="display:none;">
+              <p style="margin-top:0;"><b>&lt;도면을 펼친 여러분께&gt;</b></p>
+              <p>태어난 모든 인간은 자유롭다고, 우리는 배웁니다. 모두가 사과나무에 오를 수는 없을지라도, 사과를 꿈꾸는 마음만큼은 모두가 평등하게 가질 수 있는 거니까요.</p>
+              <p>하지만 조금만 멀리서 보게 된다면, 우리가 내리는 선택이 결국은 이미 준비된 선택지 안에서 이루어진다는 걸 깨닫게 됩니다. 세상은 언제나 우리에게 순응을 요구합니다. 태어날 때 주어진 유전자의 명령부터, 사회가 덧씌운 정상성과 효율성이라는 견고한 레이아웃까지 말입니다. 우리는 그 푸른 종이 위에 그려진 선을 따라 걷는 것이 인생이라 배웠고, 그 궤도에서 이탈하는 것을 결함이라 명명해 왔습니다.</p>
+              <p>그래서 우리는 묶이기 쉬운 시대에 살고 있나 봅니다. 다름이 죄이고, 모난 돌에 정을 때리는 세계에서, 정해진 프리셋은 우리가 숨을 곳을 남겨주니까요.</p>
+              <p>하지만 저는 묻고 싶습니다. 신체라는 외골격에 갇혀, 7개 남짓한 구멍으로 세상을 관측하는 우리가 정말로 그 도면의 의도를 온전히 이해하고 있는 것일까요? 인간은 말랑말랑한 로봇입니다. 우리가 '나의 의지'라고 믿었던 선택들이 사실은 미리 준비된 프리셋(Preset) 중 하나에 불과하다면, 우리는 이 짜여진 판 속에서 어떤 표정을 지어야 할까요?</p>
+              <p>매거진 &lt;시아노타입&gt;은 이 질문에서 시작되었습니다. 우리는 이미 그려진 운명을 무시할 만큼 오만하지 않습니다. 다만, <b>둘둘 말아 구석에 치워두었던 파란 종이 뭉치를 다시 펼쳐보려 합니다.</b> 구조를 똑바로 파악하고, 그 선들이 어디로 연결되는지 집요하게 추적하는 것. 그것이 저희가 하는 일입니다.</p>
+              <p>이제, 우리는 설계도의 여백에 주석을 달기 시작합니다.</p>
+              <p>계속 불안에 떨어야 할까요? 아니면 다 같이 웃고 즐기면 그만일까요? 외부 세계를 깨달은 시점에서 내부의 존재들은 딜레마에 빠집니다. 순응할까, 저항할까? 우리는 이 설계도를 똑바로 바라보고 구조를 파악해 보려 합니다. 혹시 모릅니다. 결함을 찾아낸다면, 자가 수리가 가능할지도!</p>
+              <p>우리는 역설계를 시도합니다.<br>이번 시아노타입의 창간호 주제는 <b>&lt;청사진:인간설계도&gt;</b>입니다.</p>
+              <p style="text-align:right; margin-top:20px;">편집장 拜</p>
+            </div>
           </div>
+          <div class="mag-item" data-img="mag1.jpg"><span class="mag-num">01</span><h2 class="mag-label">INDEX_LAYERS</h2></div>
+          <div class="mag-item" data-img="mag2.jpg"><span class="mag-num">02</span><h2 class="mag-label">CORE_SYSTEM</h2></div>
+          <div class="mag-item" data-img="mag3.jpg"><span class="mag-num">03</span><h2 class="mag-label">SPECIMEN_A</h2></div>
+          <div class="mag-item" data-img="mag4.jpg"><span class="mag-num">04</span><h2 class="mag-label">SPECIMEN_B</h2></div>
+          <div class="mag-item" data-img="mag5.jpg"><span class="mag-num">05</span><h2 class="mag-label">DE-BUGGING</h2></div>
         </div>
-        <div class="mag-item" data-img="mag1.jpg"><span class="mag-num">01</span><h2 class="mag-label">INDEX_LAYERS</h2></div>
-        <div class="mag-item" data-img="mag2.jpg"><span class="mag-num">02</span><h2 class="mag-label">CORE_SYSTEM</h2></div>
-        <div class="mag-item" data-img="mag3.jpg"><span class="mag-num">03</span><h2 class="mag-label">SPECIMEN_A</h2></div>
-        <div class="mag-item" data-img="mag4.jpg"><span class="mag-num">04</span><h2 class="mag-label">SPECIMEN_B</h2></div>
-        <div class="mag-item" data-img="mag5.jpg"><span class="mag-num">05</span><h2 class="mag-label">DE-BUGGING</h2></div>
       </div>
       <div class="mag-preview-side">
         <div id="mag-display-box"><div id="mag-content-overlay"></div></div>
@@ -440,7 +364,10 @@
       let currentPage = null; 
       let isAnimating = false; 
 
-      // 상태 초기화 함수
+      // 앱 최초 실행 시 기본 히스토리(Start Screen) 삽입
+      history.replaceState({ target: null }, '', window.location.pathname);
+
+      // 메뉴 잠금 해제 (포커스 락 리셋)
       function resetNavLock() {
         const nav = document.querySelector('nav');
         if(nav) {
@@ -449,10 +376,17 @@
         }
       }
 
-      function navigateTo(targetId, speed = 'fast') {
+      // [핵심] 네비게이션 엔진 (History API 연동)
+      // pushHistory 변수로 사용자가 '클릭'해서 이동한 건지, '뒤로가기'를 누른 건지 판별
+      function navigateTo(targetId, speed = 'fast', pushHistory = true) {
         const target = pages[targetId];
         if (isAnimating || currentPage === target || !target) return;
         
+        // 브라우저 주소창에 해시(#) 기록 추가
+        if (pushHistory) {
+          history.pushState({ target: targetId }, '', '#' + targetId);
+        }
+
         isAnimating = true;
         document.body.style.pointerEvents = 'none';
 
@@ -489,9 +423,34 @@
         if (targetId === 'magazine-page') updateMagDisplay(0);
       }
 
+      // [핵심] 스마트폰 자체 '뒤로가기' 제스처 감지
+      window.addEventListener('popstate', (e) => {
+        resetNavLock();
+        // 저장된 방문 기록이 있으면 해당 페이지로 이동 (히스토리는 새로 추가 안 함)
+        if (e.state && e.state.target) {
+          navigateTo(e.state.target, 'fast', false);
+        } else {
+          // 기록이 없으면 맨 처음(Start Screen)으로 리부트
+          if (!currentPage || isAnimating) return;
+          isAnimating = true;
+          dom.start.style.opacity = '1';
+          dom.start.style.pointerEvents = 'auto';
+          dom.exposeBg.classList.remove('exposed');
+          dom.logo.className = 'theme-blue';
+          setTimeout(() => {
+            Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
+            currentPage = null; 
+            isAnimating = false;
+          }, 500);
+        }
+      });
+
+      // 로고 클릭 시 맨 처음으로 (히스토리 초기화)
       dom.logo.addEventListener('click', () => {
         if (!currentPage || isAnimating) return;
         isAnimating = true;
+        
+        history.pushState({ target: null }, '', window.location.pathname);
         
         dom.start.style.opacity = '1';
         dom.start.style.pointerEvents = 'auto';
@@ -502,36 +461,52 @@
           Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
           currentPage = null; 
           isAnimating = false;
-          resetNavLock(); // 로고 클릭 시 메뉴 잠금 초기화
+          resetNavLock(); 
         }, 500);
       });
 
+      // START SCAN 버튼 클릭
       document.getElementById('expose-btn').addEventListener('click', () => {
         dom.start.style.opacity = '0'; 
         dom.start.style.pointerEvents = 'none';
         dom.exposeBg.classList.add('exposed'); 
-        setTimeout(() => navigateTo('main-content', 'slow'), 400); 
+        setTimeout(() => navigateTo('main-content', 'slow', true), 400); 
       });
 
+      // 메뉴 및 리스트 클릭
       document.querySelectorAll('.menu-item, .leaflet-item').forEach(el => {
         el.addEventListener('click', (e) => { 
           e.preventDefault(); 
-          
-          // 메뉴 클릭 시, 화면 전환되는 1초 동안 흐려짐/선택 상태를 강제 고정함
           if (el.classList.contains('menu-item')) {
             el.closest('nav').classList.add('nav-locked');
             el.classList.add('item-locked');
           }
-          
-          navigateTo(el.dataset.target); 
+          navigateTo(el.dataset.target, 'fast', true); 
         });
       });
 
+      // 뒤로가기 버튼 누르면 시스템 자체 history.back() 실행
       document.querySelectorAll('.btn-return').forEach(btn => btn.addEventListener('click', () => {
-        resetNavLock(); // 뒤로가기 누를 때 메뉴 잠금 해제
-        navigateTo('main-content');
+        history.back(); // 브라우저 뒤로가기 기능과 완벽하게 동일하게 작동
       }));
-      document.querySelectorAll('.btn-back-archive').forEach(btn => btn.addEventListener('click', () => navigateTo('archive-page')));
+      document.querySelectorAll('.btn-back-archive').forEach(btn => btn.addEventListener('click', () => {
+        history.back();
+      }));
+
+      // --- 매거진 모바일 토글 로직 ---
+      const magToggle = document.getElementById('mag-mobile-toggle');
+      const magListSide = document.querySelector('.mag-list-side');
+      
+      if(magToggle && magListSide) {
+        magToggle.addEventListener('click', () => {
+          magListSide.classList.toggle('open');
+          if(magListSide.classList.contains('open')) {
+            magToggle.innerHTML = '[ ✕ CLOSE MENU ]';
+          } else {
+            magToggle.innerHTML = magToggle.dataset.defaultText;
+          }
+        });
+      }
 
       const magItems = document.querySelectorAll('.mag-item');
       const magDisplay = {
@@ -544,6 +519,16 @@
         magItems.forEach(item => item.classList.remove('active'));
         magItems[index].classList.add('active');
         
+        const activeNum = magItems[index].querySelector('.mag-num').innerText;
+        const activeLabel = magItems[index].querySelector('.mag-label').innerText;
+        if(magToggle) {
+          magToggle.dataset.defaultText = `[ ${activeNum}_${activeLabel} ▾ ]`;
+          if(magListSide.classList.contains('open')) {
+            magListSide.classList.remove('open');
+            magToggle.innerHTML = magToggle.dataset.defaultText;
+          }
+        }
+
         const imgUrl = magItems[index].dataset.img;
         const textData = magItems[index].querySelector('.mag-text-data');
         

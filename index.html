@@ -18,7 +18,7 @@
       margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       background-color: var(--crt-dark);
-      color: var(--vivid-blue);
+      color: var(--bg-white); /* 흑백 베이스로 변경 */
       overflow: hidden;
     }
 
@@ -45,118 +45,124 @@
     /* =========================================
        3. 전역 UI 요소
        ========================================= */
+    
+    /* --- [신설] 브라우저 상단 탭 --- */
+    #global-tabs {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 45px;
+      display: flex; z-index: 9000; opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease, background-color 0.5s, border-color 0.5s;
+      background: var(--crt-dark); overflow-x: auto; scrollbar-width: none;
+    }
+    #global-tabs::-webkit-scrollbar { display: none; }
+    #global-tabs.visible { opacity: 1; pointer-events: auto; }
+    
+    .g-tab {
+      flex: 1; min-width: 120px; display: flex; justify-content: center; align-items: center;
+      font-family: monospace; font-weight: bold; font-size: 0.9rem;
+      cursor: pointer; transition: all 0.3s; text-transform: uppercase;
+      letter-spacing: 1px; white-space: nowrap; padding: 0 15px;
+    }
+    .g-tab.locked { opacity: 0.3; cursor: not-allowed; }
+
+    /* 상단 탭 흑백 테마 (그랜드 메인용) */
+    #global-tabs.theme-bw { border-bottom: 1px solid var(--bg-white); }
+    #global-tabs.theme-bw .g-tab { border-right: 1px solid rgba(255,255,255,0.3); color: var(--bg-white); }
+    #global-tabs.theme-bw .g-tab.active { background: var(--bg-white); color: var(--crt-dark); }
+    
+    /* 상단 탭 파란색 테마 (1호 VOL.1용) */
+    #global-tabs.theme-blue { border-bottom: 1px solid var(--vivid-blue); }
+    #global-tabs.theme-blue .g-tab { border-right: 1px solid rgba(0,51,255,0.3); color: var(--vivid-blue); }
+    #global-tabs.theme-blue .g-tab.active { background: var(--vivid-blue); color: var(--crt-dark); }
+
+    /* 글로벌 로고 */
     #global-logo {
-      position: fixed; top: 40px; left: 50px; font-size: 1.5rem; font-weight: 900;
-      letter-spacing: 4px; cursor: pointer; z-index: 9999;
-      transition: color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-      color: var(--vivid-blue);
+      position: fixed; top: 65px; left: 30px; /* 탭에 가려지지 않게 아래로 이동 */
+      width: 40px; height: 40px; cursor: pointer; z-index: 9999;
+      transition: background-color 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+      background-color: var(--vivid-blue);
+      -webkit-mask-image: url('여기에_로고_파일이름.png'); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center left;
+      mask-image: url('여기에_로고_파일이름.png'); mask-size: contain; mask-repeat: no-repeat; mask-position: center left;
     }
     #global-logo:hover { opacity: 0.6; }
-    #global-logo.theme-blue { color: var(--vivid-blue); }
-    #global-logo.theme-black { color: var(--crt-dark); }
-    #global-logo.theme-white { color: var(--bg-white); }
+    #global-logo.theme-blue { background-color: var(--vivid-blue); }
+    #global-logo.theme-black { background-color: var(--crt-dark); }
+    #global-logo.theme-white { background-color: var(--bg-white); }
 
-    #start-screen {
-      position: absolute; inset: 0; display: flex; justify-content: center; align-items: center;
-      z-index: 60; transition: opacity 0.5s ease; background-color: var(--crt-dark);
-    }
-    #exposure-bg {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: var(--vivid-blue); opacity: 0; z-index: 40; transition: opacity 0.2s ease;
-    }
+    #start-screen { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 60; transition: opacity 0.5s ease; background-color: var(--vivid-blue); }
+    #start-screen ~ #global-logo { background-color: var(--bg-white); }
+    #exposure-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-white); opacity: 0; z-index: 40; transition: opacity 0.2s ease; }
     #exposure-bg.exposed { opacity: 1; }
 
-    #scanner-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 80; pointer-events: none; opacity: 0;
-    }
+    #scanner-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 80; pointer-events: none; opacity: 0; }
     #scanner-overlay.scanning { opacity: 1; }
-    .scanner-light {
-      position: absolute; left: 0; width: 100%; height: 3px;
-      background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8); z-index: 10; top: 0%;
-    }
+    .scanner-light { position: absolute; left: 0; width: 100%; height: 3px; background-color: #fff; box-shadow: 0 0 30px 10px rgba(0, 51, 255, 0.8); z-index: 10; top: 0%; }
 
-    .retro-btn {
-      background: transparent; color: var(--vivid-blue); border: 2px solid var(--vivid-blue); 
-      padding: 12px 24px; font-size: 1rem; font-family: monospace; font-weight: bold;
-      letter-spacing: 3px; cursor: pointer; text-transform: uppercase;
-      box-shadow: 0 0 10px var(--vivid-blue), inset 0 0 10px var(--vivid-blue);
-      text-shadow: 0 0 5px var(--vivid-blue); transition: all 0.2s ease;
-    }
+    #expose-btn { width: 80px; height: 80px; padding: 0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0; cursor: pointer; background: transparent; color: var(--bg-white); border: 2px solid var(--bg-white); box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
+    #expose-btn:hover { background: var(--bg-white); box-shadow: 0 0 25px var(--bg-white); }
+
+    .retro-btn { background: transparent; color: var(--vivid-blue); border: 2px solid var(--vivid-blue); padding: 12px 24px; font-size: 1rem; font-family: monospace; font-weight: bold; letter-spacing: 3px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 10px var(--vivid-blue), inset 0 0 10px var(--vivid-blue); text-shadow: 0 0 5px var(--vivid-blue); transition: all 0.2s ease; }
     .retro-btn:hover { background: var(--vivid-blue); color: var(--crt-dark); }
-
-    .btn-return, .btn-back-archive {
-      position: absolute !important; 
-      bottom: 5% !important; 
-      left: 50% !important;
-      transform: translateX(-50%) !important; 
-      z-index: 999 !important; 
-    }
+    .btn-return, .btn-back-archive { position: absolute !important; bottom: 5% !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999 !important; }
     #magazine-page .btn-return { color: var(--bg-white) !important; border-color: var(--bg-white) !important; }
     #magazine-page .btn-return:hover { background: var(--bg-white) !important; color: var(--vivid-blue) !important; }
+    
+    /* 흑백 페이지용 버튼 테마 */
+    .theme-bw-btn { color: var(--bg-white); border-color: var(--bg-white); box-shadow: none; text-shadow: none; }
+    .theme-bw-btn:hover { background: var(--bg-white); color: var(--crt-dark); box-shadow: 0 0 15px rgba(255,255,255,0.5); }
 
     /* =========================================
        4. 각 페이지 레이어 및 구조
        ========================================= */
-    .page-layer {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      clip-path: inset(0 0 100% 0); z-index: 45;
-    }
+    .page-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; clip-path: inset(0 0 100% 0); z-index: 45; }
     
-    #main-content { background-color: var(--bg-white); }
-    #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
-    #members-page { background-color: var(--bg-white); color: var(--vivid-blue); }
-    #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
+    /* --- [신설] 전체 메인 (그랜드 메인 - 흑백) --- */
+    #grand-main-page { background-color: var(--crt-dark); color: var(--bg-white); justify-content: flex-start; padding-top: 10vh; }
+    .team-header { text-align: center; margin-bottom: 3rem; z-index: 10; position: relative; }
+    .team-header h1 { font-size: clamp(3rem, 8vw, 5rem); margin: 0; letter-spacing: 15px; font-weight: 900; }
+    .team-header p { font-family: monospace; font-size: 1.2rem; opacity: 0.6; margin-top: 10px; letter-spacing: 2px; }
 
-    /* --- [수정] 메인 메뉴: 서류철(File Layout) 아키텍처 --- */
-    nav.file-layout {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      width: 100%; height: 100vh; position: relative; margin-top: 10vh;
-    }
+    /* 멤버 그리드 (흑백 강제 적용) */
+    .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 50vh; margin: 0 auto; }
+    .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
+    .member-initial { font-size: clamp(6rem, 12vw, 10rem); font-weight: 900; color: var(--bg-white); transition: all 0.5s ease; }
+    .members-initial-grid:hover .member-initial { opacity: 0; }
+    .members-initial-grid .member-box:hover .member-initial { opacity: 1; transform: scale(1.1); }
+    .member-detail { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.6s ease; color: var(--bg-white); }
+    .detail-right { right: 0; padding-left: 60px; text-align: left; }
+    .detail-left { left: 0; padding-right: 60px; text-align: right; }
+    .member-box:hover .member-detail { opacity: 1; transform: translateX(0); }
+    .detail-role { font-family: monospace; letter-spacing: 2px; opacity: 0.6; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+    .detail-name { font-size: 3rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; line-height: 1; }
+    .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
+
+    /* --- [수정] 1호 메인 메뉴 (VOL.1 파일 레이아웃) --- */
+    #vol1-main-content { background-color: var(--bg-white); color: var(--vivid-blue); }
+    nav.file-layout { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100vh; position: relative; margin-top: 5vh; }
     
+    /* 1호는 매거진과 아카이브 두 개만 존재하므로 크기를 키움 */
     .file-tab {
-      width: 65vw; max-width: 700px; height: 140px;
+      width: 70vw; max-width: 800px; height: 180px; /* 높이 확장 */
       border: 2px solid var(--vivid-blue); border-bottom: none;
-      border-radius: 15px 15px 0 0; /* 윗부분만 둥글게 깎아 탭 모양 형성 */
-      background-color: var(--crt-dark);
-      margin-bottom: -50px; /* 파일이 겹쳐 보이도록 음수 마진 적용 */
-      position: relative; text-decoration: none;
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 -10px 20px rgba(0,0,0,0.5); /* 겹친 그림자 효과 */
+      border-radius: 20px 20px 0 0; background-color: var(--crt-dark);
+      margin-bottom: -60px; position: relative; text-decoration: none;
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 20px rgba(0,0,0,0.5); 
     }
+    .file-tab:nth-child(1) { z-index: 2; }
+    .file-tab:nth-child(2) { z-index: 1; }
+
+    .tab-header { font-size: 3.5rem; font-weight: 900; color: var(--vivid-blue); padding: 30px 50px; margin: 0; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s ease; }
+    .tab-meta { position: absolute; right: 40px; top: 40px; font-family: monospace; color: rgba(0, 51, 255, 0.5); font-size: 1.2rem; }
+
+    @media (hover: hover) and (pointer: fine) { .file-tab:hover { transform: translateY(-30px); z-index: 10; } }
+    .file-tab.selected { transform: translateY(-80px) scale(1.05); background-color: var(--vivid-blue); z-index: 20; border-color: var(--vivid-blue); }
+    .file-tab.selected .tab-header, .file-tab.selected .tab-meta { color: var(--crt-dark); }
+
+    /* --- 이하 상세 페이지는 파란색 세계관 유지 --- */
+    #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
+    #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
     
-    /* Z-index를 수동으로 줘서 위에서 아래로 덮이게 설정 */
-    .file-tab:nth-child(1) { z-index: 3; }
-    .file-tab:nth-child(2) { z-index: 2; }
-    .file-tab:nth-child(3) { z-index: 1; }
-
-    .tab-header {
-      font-size: 2.5rem; font-weight: 900; color: var(--vivid-blue);
-      padding: 20px 40px; margin: 0; text-transform: uppercase; letter-spacing: 2px;
-      transition: color 0.3s ease;
-    }
-    .tab-meta {
-      position: absolute; right: 30px; top: 30px; font-family: monospace;
-      color: rgba(0, 51, 255, 0.5); font-size: 1rem;
-    }
-
-    /* 1단계: 호버 시 위로 살짝 뽑힘 */
-    @media (hover: hover) and (pointer: fine) {
-      .file-tab:hover { transform: translateY(-25px); z-index: 10; }
-    }
-    
-    /* 2단계: 클릭 시 시선을 강탈하며 완전히 솟구침 */
-    .file-tab.selected {
-      transform: translateY(-60px) scale(1.05);
-      background-color: var(--vivid-blue);
-      z-index: 20; border-color: var(--vivid-blue);
-    }
-    .file-tab.selected .tab-header, .file-tab.selected .tab-meta {
-      color: var(--crt-dark);
-    }
-
-    /* --- 매거진 스플릿 뷰 & 드롭다운 구조 --- */
     .magazine-split-view { display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative; }
     .mag-list-side { flex: 1.2; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px; position: relative; }
     .mag-mobile-toggle { display: none; } 
@@ -172,60 +178,32 @@
     #mag-content-overlay::-webkit-scrollbar { width: 4px; }
     #mag-content-overlay::-webkit-scrollbar-thumb { background: var(--bg-white); }
 
-    /* --- [수정] 아카이브 페이지: 책꽂이(Bookshelf) 컨셉 --- */
-    .bookshelf-container {
-      display: flex; height: 60vh; width: 80%; max-width: 1000px;
-      border: 2px solid var(--vivid-blue); border-top: none; /* 위가 뚫린 선반 모양 */
-      padding: 0 15px 15px 15px; gap: 8px; align-items: flex-end; margin-bottom: 2rem;
-    }
-    
-    .book-spine {
-      flex: 1; height: 95%; border: 1px solid var(--vivid-blue);
-      background-color: var(--crt-dark); color: var(--vivid-blue);
-      writing-mode: vertical-rl; transform: rotate(180deg); /* 텍스트 세로 정렬 */
-      display: flex; justify-content: center; align-items: center;
-      font-family: monospace; font-size: 1.8rem; font-weight: bold; letter-spacing: 6px;
-      cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    
-    /* 호버 시 파란색으로 물들며 두꺼워짐 */
-    .book-spine:hover {
-      background-color: var(--vivid-blue); color: var(--bg-white); 
-      flex: 1.6; height: 100%; box-shadow: 0 0 20px rgba(0, 51, 255, 0.4);
-    }
+    .bookshelf-container { display: flex; height: 60vh; width: 80%; max-width: 1000px; border: 2px solid var(--vivid-blue); border-top: none; padding: 0 15px 15px 15px; gap: 8px; align-items: flex-end; margin-bottom: 2rem; }
+    .book-spine { flex: 1; height: 95%; border: 1px solid var(--vivid-blue); background-color: var(--crt-dark); color: var(--vivid-blue); writing-mode: vertical-rl; transform: rotate(180deg); display: flex; justify-content: center; align-items: center; font-family: monospace; font-size: 1.8rem; font-weight: bold; letter-spacing: 6px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .book-spine:hover { background-color: var(--vivid-blue); color: var(--bg-white); flex: 1.6; height: 100%; box-shadow: 0 0 20px rgba(0, 51, 255, 0.4); }
 
-    /* 아카이브 상세 모달 (유지) */
     .detail-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     .detail-container { display: flex; gap: 40px; width: 80%; max-width: 1000px; height: 60vh; align-items: center; }
     .detail-image-area { flex: 1; height: 100%; border: 1px solid var(--vivid-blue); background-size: contain; background-repeat: no-repeat; background-position: center; }
     .detail-text-area { flex: 1; text-align: left; }
 
-    /* --- 멤버 페이지 (좌표계 뷰) --- */
-    .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 60vh; margin: 0 auto; }
-    .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
-    .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0, 51, 255, 0.15); pointer-events: none; }
-    .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
-    .member-initial { font-size: clamp(8rem, 15vw, 13rem); font-weight: 900; color: var(--vivid-blue); transition: all 0.5s ease; }
-    .members-initial-grid:hover .member-initial { opacity: 0; }
-    .members-initial-grid .member-box:hover .member-initial { opacity: 1; transform: scale(1.1); }
-    .member-detail { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.6s ease; }
-    .detail-right { right: 0; padding-left: 60px; text-align: left; }
-    .detail-left { left: 0; padding-right: 60px; text-align: right; }
-    .member-box:hover .member-detail { opacity: 1; transform: translateX(0); }
-    .detail-role { font-family: monospace; letter-spacing: 2px; opacity: 0.6; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-    .detail-name { font-size: 3rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; line-height: 1; }
-    .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
-
     /* =========================================
        5. 반응형 웹 최적화 (Mobile UI 대폭 강화)
        ========================================= */
     @media (max-width: 768px) {
-      #global-logo { top: 20px; left: 20px; font-size: 1.1rem; }
+      #global-logo { top: 60px; left: 15px; width: 30px; height: 30px; }
+      #expose-btn { width: 70px; height: 70px; }
+      
+      /* 상단 브라우저 탭 모바일화 */
+      #global-tabs { height: 40px; }
+      .g-tab { min-width: 100px; font-size: 0.8rem; padding: 0 10px; }
 
-      /* 모바일 서류철: 가로를 꽉 채우고 위아래 공간 확보 */
-      .file-tab { width: 90vw; height: 110px; margin-bottom: -30px; }
-      .tab-header { font-size: 1.8rem; padding: 15px 20px; }
-      .tab-meta { top: 20px; right: 20px; }
+      .team-header h1 { letter-spacing: 5px; }
+      .team-header p { font-size: 0.9rem; }
+
+      .file-tab { width: 90vw; height: 140px; margin-bottom: -40px; }
+      .tab-header { font-size: 2.2rem; padding: 20px 25px; }
+      .tab-meta { top: 25px; right: 25px; }
 
       .magazine-split-view { flex-direction: column; height: 80vh; justify-content: flex-start; gap: 0; margin-top: 10vh; }
       .mag-list-side { width: 85%; padding-left: 0; border-left: none; position: relative; z-index: 30; }
@@ -239,15 +217,8 @@
       #mag-display-box { width: 90%; height: 55vh; max-height: 55vh; padding: 25px; }
       #mag-content-overlay { font-size: 0.9rem; }
 
-      /* 모바일 책꽂이: 가로 스크롤 활성화 */
-      .bookshelf-container { 
-        width: 90%; padding: 0 5px 10px 5px; overflow-x: auto; 
-        justify-content: flex-start; /* 좌측 정렬 후 스크롤 */
-      }
-      .book-spine { 
-        min-width: 60px; /* 모바일 터치를 위한 최소 너비 확보 */
-        font-size: 1.2rem;
-      }
+      .bookshelf-container { width: 90%; padding: 0 5px 10px 5px; overflow-x: auto; justify-content: flex-start; }
+      .book-spine { min-width: 60px; font-size: 1.2rem; }
       
       .page-title { font-size: 2rem !important; margin-bottom: 1rem; margin-top: 30px; }
       .detail-container { flex-direction: column; height: 75vh; gap: 15px; padding-top: 40px; }
@@ -256,9 +227,9 @@
       .detail-text-area h2 { font-size: 2rem; margin-bottom: 10px; }
       .detail-text-area p { font-size: 0.95rem; }
 
-      .members-initial-grid { display: flex; flex-direction: column; height: 75vh; overflow-y: auto; gap: 2.5rem; padding-top: 40px; width: 90%; }
+      .members-initial-grid { display: flex; flex-direction: column; height: 60vh; overflow-y: auto; gap: 2.5rem; padding-top: 20px; width: 90%; }
       .grid-crosshair-x, .grid-crosshair-y { display: none; } 
-      .member-box { flex-direction: column; width: 100%; position: relative; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed rgba(0, 51, 255, 0.3); }
+      .member-box { flex-direction: column; width: 100%; position: relative; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.3); }
       .member-box:last-child { border-bottom: none; }
       .member-initial { font-size: 4rem; opacity: 1; text-align: center; margin-bottom: 5px; } 
       .members-initial-grid:hover .member-initial { opacity: 1; } 
@@ -272,14 +243,64 @@
 </head>
 <body class="crt-flicker">
   
+  <div id="global-tabs" class="theme-bw">
+    <div class="g-tab active" data-target="grand-main-page">TEAM ROOT</div>
+    <div class="g-tab" data-target="vol1-main-content">VOL.1 [BLUE]</div>
+    <div class="g-tab locked">VOL.2 [LOCKED]</div>
+    <div class="g-tab locked">VOL.3 [LOCKED]</div>
+  </div>
+
   <div id="global-logo">CYANO</div>
   <div class="crt-overlay"></div>
   
-  <div id="start-screen"><button id="expose-btn" class="retro-btn">[ START SCAN ]</button></div>
+  <div id="start-screen"><button id="expose-btn" class="retro-btn"></button></div>
   <div id="exposure-bg"></div>
   <div id="scanner-overlay"><div class="scanner-light"></div></div>
 
-  <div id="main-content" class="page-layer">
+  <div id="grand-main-page" class="page-layer">
+    <div class="team-header">
+      <h1>CYANOTYPE</h1>
+      <p>REVERSE-ENGINEERING ARCHIVE TEAM</p>
+    </div>
+    
+    <div class="members-initial-grid">
+      <div class="grid-crosshair-x"></div><div class="grid-crosshair-y"></div>
+      <div class="member-box">
+        <div class="member-initial">M</div>
+        <div class="member-detail detail-right">
+          <div class="detail-role">VISUAL JUSTIFIER</div>
+          <h2 class="detail-name">문유경</h2>
+          <p class="detail-manifesto">"내가 내 눈으로 본 세상과 의도를 시각적 언어로 번역합니다. 파편화된 이미지들을 모아 흔들리지 않는 하나의 정당한 층(Layer)으로 증명해 냅니다."</p>
+        </div>
+      </div>
+      <div class="member-box">
+        <div class="member-initial">R</div>
+        <div class="member-detail detail-left">
+          <div class="detail-role">LOGIC ARCHITECT</div>
+          <h2 class="detail-name">류선우</h2>
+          <p class="detail-manifesto">"우리의 취향이 곧 세계가 되도록 논리의 뼈대를 세웁니다. 관람객이 이 공간에 설득당할 수밖에 없는 완벽한 흐름과 동선을 설계합니다."</p>
+        </div>
+      </div>
+      <div class="member-box">
+        <div class="member-initial">J</div>
+        <div class="member-detail detail-right">
+          <div class="detail-role">TASTE CURATOR</div>
+          <h2 class="detail-name">권준</h2>
+          <p class="detail-manifesto">"무엇이 그럴듯한지, 무엇이 우리의 세계관에 부합하는지 치밀하게 판별합니다. 타협하지 않는 기준으로 이 터미널의 순도를 유지합니다."</p>
+        </div>
+      </div>
+      <div class="member-box">
+        <div class="member-initial">H</div>
+        <div class="member-detail detail-left">
+          <div class="detail-role">CYAN OPERATOR</div>
+          <h2 class="detail-name">황윤하</h2>
+          <p class="detail-manifesto">"푸른빛의 감광액을 바르고 빛을 쪼여 실체를 기록합니다. 추상적인 우리의 선언을 물리적인 결과물로 변환하여 세상에 남깁니다."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="vol1-main-content" class="page-layer">
     <nav class="file-layout">
       <a href="#" class="file-tab" data-target="magazine-page">
         <h2 class="tab-header">1. MAGAZINE</h2>
@@ -288,10 +309,6 @@
       <a href="#" class="file-tab" data-target="archive-page">
         <h2 class="tab-header">2. ARCHIVE</h2>
         <span class="tab-meta">DATA_SET</span>
-      </a>
-      <a href="#" class="file-tab" data-target="members-page">
-        <h2 class="tab-header">3. INFO</h2>
-        <span class="tab-meta">MEMBERS</span>
       </a>
     </nav>
   </div>
@@ -327,7 +344,7 @@
         <div id="mag-display-box"><div id="mag-content-overlay"></div></div>
       </div>
     </div>
-    <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
+    <button class="retro-btn btn-return">[ RETURN TO VOL.1 ]</button>
   </div>
 
   <div id="archive-page" class="page-layer">
@@ -340,57 +357,13 @@
       <div class="book-spine" data-target="detail-page-4">2026.03.17</div>
     </div>
     
-    <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
+    <button class="retro-btn btn-return">[ RETURN TO VOL.1 ]</button>
   </div>
 
   <div id="detail-page-1" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area"></div><div class="detail-text-area"><h2>MANIFESTO</h2><p>설명.</p></div></div><button class="retro-btn btn-back-archive">[ BACK ]</button></div>
   <div id="detail-page-2" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area"></div><div class="detail-text-area"><h2>BLUEPRINT</h2><p>설명.</p></div></div><button class="retro-btn btn-back-archive">[ BACK ]</button></div>
   <div id="detail-page-3" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area"></div><div class="detail-text-area"><h2>CYAN_EXPO</h2><p>설명.</p></div></div><button class="retro-btn btn-back-archive">[ BACK ]</button></div>
   <div id="detail-page-4" class="page-layer detail-page"><div class="detail-container"><div class="detail-image-area"></div><div class="detail-text-area"><h2>REACTION</h2><p>설명.</p></div></div><button class="retro-btn btn-back-archive">[ BACK ]</button></div>
-
-  <div id="members-page" class="page-layer">
-    <div class="members-initial-grid">
-      <div class="grid-crosshair-x"></div><div class="grid-crosshair-y"></div>
-      
-      <div class="member-box">
-        <div class="member-initial">M</div>
-        <div class="member-detail detail-right">
-          <div class="detail-role">VISUAL JUSTIFIER</div>
-          <h2 class="detail-name">문유경</h2>
-          <p class="detail-manifesto">"내가 내 눈으로 본 세상과 의도를 시각적 언어로 번역합니다. 파편화된 이미지들을 모아 흔들리지 않는 하나의 정당한 층(Layer)으로 증명해 냅니다."</p>
-        </div>
-      </div>
-      
-      <div class="member-box">
-        <div class="member-initial">R</div>
-        <div class="member-detail detail-left">
-          <div class="detail-role">LOGIC ARCHITECT</div>
-          <h2 class="detail-name">류선우</h2>
-          <p class="detail-manifesto">"우리의 취향이 곧 세계가 되도록 논리의 뼈대를 세웁니다. 관람객이 이 공간에 설득당할 수밖에 없는 완벽한 흐름과 동선을 설계합니다."</p>
-        </div>
-      </div>
-      
-      <div class="member-box">
-        <div class="member-initial">J</div>
-        <div class="member-detail detail-right">
-          <div class="detail-role">TASTE CURATOR</div>
-          <h2 class="detail-name">권준</h2>
-          <p class="detail-manifesto">"무엇이 그럴듯한지, 무엇이 우리의 세계관에 부합하는지 치밀하게 판별합니다. 타협하지 않는 기준으로 이 터미널의 순도를 유지합니다."</p>
-        </div>
-      </div>
-      
-      <div class="member-box">
-        <div class="member-initial">H</div>
-        <div class="member-detail detail-left">
-          <div class="detail-role">CYAN OPERATOR</div>
-          <h2 class="detail-name">황윤하</h2>
-          <p class="detail-manifesto">"푸른빛의 감광액을 바르고 빛을 쪼여 실체를 기록합니다. 추상적인 우리의 선언을 물리적인 결과물로 변환하여 세상에 남깁니다."</p>
-        </div>
-      </div>
-      
-    </div>
-    <button class="retro-btn btn-return">[ RETURN TO MENU ]</button>
-  </div>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -399,7 +372,9 @@
         start: document.getElementById('start-screen'),
         exposeBg: document.getElementById('exposure-bg'),
         scanner: document.getElementById('scanner-overlay'),
-        logo: document.getElementById('global-logo')
+        logo: document.getElementById('global-logo'),
+        tabsContainer: document.getElementById('global-tabs'),
+        gTabs: document.querySelectorAll('.g-tab:not(.locked)')
       };
       
       const pages = {};
@@ -410,9 +385,33 @@
 
       history.replaceState({ target: null }, '', window.location.pathname);
 
-      // 서류철 선택 해제 로직 추가
       function resetNavSelection() {
         document.querySelectorAll('.file-tab').forEach(tab => tab.classList.remove('selected'));
+      }
+
+      function updateGlobalTabsTheme(targetId) {
+        if (!dom.tabsContainer) return;
+        
+        // 상단 탭 활성화 상태 업데이트
+        dom.gTabs.forEach(tab => {
+          tab.classList.remove('active');
+          if (targetId.includes('vol1') || targetId.includes('mag') || targetId.includes('arch') || targetId.includes('detail')) {
+            if (tab.dataset.target === 'vol1-main-content') tab.classList.add('active');
+          } else if (targetId === 'grand-main-page') {
+            if (tab.dataset.target === 'grand-main-page') tab.classList.add('active');
+          }
+        });
+
+        // 페이지 성격에 따라 탭과 로고의 테마(색상) 강제 전환
+        if (targetId === 'grand-main-page') {
+          dom.tabsContainer.className = 'theme-bw visible';
+          dom.logo.className = 'theme-white'; 
+        } else {
+          dom.tabsContainer.className = 'theme-blue visible';
+          if (targetId === 'vol1-main-content') dom.logo.className = 'theme-black';
+          else if (targetId === 'magazine-page') dom.logo.className = 'theme-white';
+          else dom.logo.className = 'theme-blue';
+        }
       }
 
       function navigateTo(targetId, speed = 'fast', pushHistory = true) {
@@ -426,9 +425,7 @@
 
         const duration = speed === 'slow' ? 2500 : 1000;
 
-        if (targetId === 'main-content' || targetId === 'members-page') dom.logo.className = 'theme-black';
-        else if (targetId === 'magazine-page') dom.logo.className = 'theme-white';
-        else dom.logo.className = 'theme-blue';
+        updateGlobalTabsTheme(targetId);
 
         dom.scanner.classList.remove('scanning', 'fast', 'slow');
         void dom.scanner.offsetWidth; 
@@ -451,8 +448,7 @@
           isAnimating = false;
           document.body.style.pointerEvents = 'auto'; 
           
-          // 화면 전환 끝난 후 파일 탭 선택 해제
-          if (targetId !== 'main-content') resetNavSelection();
+          resetNavSelection();
 
         }, duration);
         
@@ -471,7 +467,9 @@
           dom.start.style.opacity = '1';
           dom.start.style.pointerEvents = 'auto';
           dom.exposeBg.classList.remove('exposed');
-          dom.logo.className = 'theme-blue';
+          dom.logo.className = 'theme-white'; // 진입화면은 파란배경이므로 로고는 흰색
+          dom.tabsContainer.classList.remove('visible'); // 탭 숨기기
+          
           setTimeout(() => {
             Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
             currentPage = null; 
@@ -489,7 +487,8 @@
         dom.start.style.opacity = '1';
         dom.start.style.pointerEvents = 'auto';
         dom.exposeBg.classList.remove('exposed');
-        dom.logo.className = 'theme-blue';
+        dom.logo.className = 'theme-white';
+        dom.tabsContainer.classList.remove('visible');
         
         setTimeout(() => {
           Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
@@ -503,15 +502,22 @@
         dom.start.style.opacity = '0'; 
         dom.start.style.pointerEvents = 'none';
         dom.exposeBg.classList.add('exposed'); 
-        setTimeout(() => navigateTo('main-content', 'slow', true), 400); 
+        
+        setTimeout(() => navigateTo('grand-main-page', 'slow', true), 400); 
       });
 
-      // [수정] 파일 탭 클릭 시 selected 클래스 부여
+      // 브라우저 탭 클릭 이벤트
+      dom.gTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          navigateTo(tab.dataset.target, 'fast', true);
+        });
+      });
+
       document.querySelectorAll('.file-tab, .book-spine').forEach(el => {
         el.addEventListener('click', (e) => { 
           e.preventDefault(); 
           if (el.classList.contains('file-tab')) {
-            el.classList.add('selected'); // 클릭 시 위로 솟구치는 효과
+            el.classList.add('selected'); 
           }
           navigateTo(el.dataset.target, 'fast', true); 
         });
@@ -585,3 +591,4 @@
   </script>
 </body>
 </html>
+

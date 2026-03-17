@@ -14,6 +14,10 @@
       --crt-dark: #0a0a0a;
     }
     
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    
     body, html {
       margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -23,11 +27,9 @@
     }
 
     /* =========================================
-       2. 시각적 이펙트 및 애니메이션
+       2. 시각적 이펙트 및 애니메이션 (깜빡임 제거)
        ========================================= */
-    @keyframes flicker { 0% { opacity: 0.95; } 100% { opacity: 1; } }
-    .crt-flicker { animation: flicker 0.15s infinite; }
-
+    /* CRT 주사선 오버레이 (눈이 아프지 않은 고정된 스캔라인만 남김) */
     .crt-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
@@ -97,9 +99,11 @@
 
     .retro-btn { background: transparent; color: var(--vivid-blue); border: 2px solid var(--vivid-blue); padding: 12px 24px; font-size: 1rem; font-family: monospace; font-weight: bold; letter-spacing: 3px; cursor: pointer; text-transform: uppercase; box-shadow: 0 0 10px var(--vivid-blue), inset 0 0 10px var(--vivid-blue); text-shadow: 0 0 5px var(--vivid-blue); transition: all 0.2s ease; }
     .retro-btn:hover { background: var(--vivid-blue); color: var(--crt-dark); }
-    .btn-return, .btn-back-archive { position: absolute !important; bottom: 5% !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999 !important; }
-    #magazine-page .btn-return { color: var(--bg-white) !important; border-color: var(--bg-white) !important; }
-    #magazine-page .btn-return:hover { background: var(--bg-white) !important; color: var(--vivid-blue) !important; }
+    .btn-return, .btn-back-archive { position: absolute !important; bottom: 5% !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999 !important; white-space: nowrap; }
+    
+    /* 어두운 배경(매거진/멤버 등)용 버튼 하얀색 강제 보정 */
+    #magazine-page .btn-return, #members-page .btn-return { color: var(--bg-white) !important; border-color: var(--bg-white) !important; box-shadow: none; text-shadow: none; }
+    #magazine-page .btn-return:hover, #members-page .btn-return:hover { background: var(--bg-white) !important; color: var(--crt-dark) !important; }
 
     /* =========================================
        4. 각 페이지 레이어 및 구조
@@ -107,18 +111,24 @@
     .page-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; clip-path: inset(0 0 100% 0); z-index: 45; }
     
     /* --- 그랜드 메인 (팀 루트) --- */
-    #grand-main-page { background-color: var(--crt-dark); color: var(--bg-white); justify-content: flex-start; padding-top: 12vh; }
-    .team-header { text-align: center; margin-bottom: 2rem; z-index: 10; position: relative; }
+    #grand-main-page { background-color: var(--crt-dark); color: var(--bg-white); justify-content: center; }
+    .team-header { text-align: center; margin-bottom: 3rem; z-index: 10; position: relative; }
     .team-header h1 { font-size: clamp(3rem, 8vw, 5rem); margin: 0; letter-spacing: 15px; font-weight: 900; }
-    .team-header p { font-family: monospace; font-size: 1.2rem; opacity: 0.6; margin-top: 10px; letter-spacing: 2px; }
+    .team-header p { font-family: monospace; font-size: 1.2rem; opacity: 0.6; margin-top: 10px; letter-spacing: 2px; word-break: keep-all; }
 
-    .grand-menu { display: flex; gap: 20px; margin-bottom: 2rem; z-index: 10; position: relative; }
-    .gm-btn { border: 1px solid rgba(255,255,255,0.5); color: var(--bg-white); padding: 12px 24px; font-family: monospace; font-size: 1rem; cursor: pointer; transition: all 0.3s; letter-spacing: 2px; }
+    .grand-menu { display: flex; gap: 20px; z-index: 10; position: relative; justify-content: center; flex-wrap: wrap; margin-bottom: 15px; }
+    .gm-btn { border: 1px solid rgba(255,255,255,0.5); color: var(--bg-white); padding: 12px 24px; font-family: monospace; font-size: 1rem; cursor: pointer; transition: all 0.3s; letter-spacing: 2px; white-space: nowrap; }
     .gm-btn:hover { background: var(--bg-white); color: var(--crt-dark); transform: translateY(-3px); }
     .gm-btn.locked { opacity: 0.3; cursor: not-allowed; border-style: dashed; }
     .gm-btn.locked:hover { background: transparent; color: var(--bg-white); transform: none; }
 
-    .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 45vh; margin: 0 auto; }
+    /* 멤버 스위치용 버튼 특별 스타일 */
+    .gm-btn.info-btn { border-color: var(--vivid-blue); color: var(--vivid-blue); }
+    .gm-btn.info-btn:hover { background: var(--vivid-blue); color: var(--bg-white); }
+
+    /* --- [신설] 멤버 전용 독립 공간 --- */
+    #members-page { background-color: var(--crt-dark); color: var(--bg-white); justify-content: flex-start; padding-top: 10vh; }
+    .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 60vh; margin: 0 auto; }
     .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.15); pointer-events: none; }
     .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255, 255, 255, 0.15); pointer-events: none; }
     .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
@@ -133,61 +143,32 @@
     .detail-name { font-size: 3rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; line-height: 1; }
     .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
 
-    /* --- [핵심 수정] VOL.1 서류철(File Layout) 화이트 테마 & 라벨링 --- */
+    /* --- VOL.1 서류철(File Layout) --- */
     #vol1-main-content { background-color: var(--bg-white); }
+    nav.file-layout { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100vh; position: relative; margin-top: 5vh; }
     
-    nav.file-layout { 
-      display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      width: 100%; height: 100vh; position: relative; margin-top: 5vh; 
-    }
-    
-    .file-tab { 
-      width: 70vw; max-width: 800px; height: 160px; 
-      border: 3px solid var(--vivid-blue); 
-      border-radius: 0 15px 15px 15px; /* 왼쪽 위 라벨 공간 확보를 위해 각지게 처리 */
-      background-color: var(--bg-white); 
-      position: relative; text-decoration: none; 
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15); 
-      margin-top: -30px; /* 아래 파일이 위로 올라오면서 앞쪽으로 덮이는 구조 */
-    }
+    .file-tab { width: 70vw; max-width: 800px; height: 160px; border: 3px solid var(--vivid-blue); border-radius: 0 15px 15px 15px; background-color: var(--bg-white); position: relative; text-decoration: none; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 15px 30px rgba(0,0,0,0.15); margin-top: -30px; }
     .file-tab:first-child { margin-top: 0; }
-
-    /* 레이어 역전: 아래쪽에 선언된 파일일수록 사용자에게 가깝게(z-index 높게) 배치 */
     .file-tab:nth-child(1) { z-index: 1; }
-    .file-tab:nth-child(2) { z-index: 2; border-radius: 15px; } /* 두 번째는 라벨이 중앙에 있으므로 전체 둥글게 */
+    .file-tab:nth-child(2) { z-index: 2; border-radius: 15px; }
 
-    /* 툭 튀어나온 견출지 라벨 디자인 */
-    .tab-header { 
-      position: absolute; top: -50px; 
-      background-color: var(--vivid-blue); color: var(--bg-white); 
-      padding: 12px 30px; font-size: 2rem; font-weight: 900; 
-      border: 3px solid var(--vivid-blue); border-bottom: none; 
-      border-radius: 15px 15px 0 0; text-transform: uppercase; letter-spacing: 2px; 
-      height: 50px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-    
-    /* 라벨이 서로 가리지 않도록 위치 엇갈리게 배치 */
+    .tab-header { position: absolute; top: -50px; background-color: var(--vivid-blue); color: var(--bg-white); padding: 12px 30px; font-size: 2rem; font-weight: 900; border: 3px solid var(--vivid-blue); border-bottom: none; border-radius: 15px 15px 0 0; text-transform: uppercase; letter-spacing: 2px; height: 50px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; white-space: nowrap; }
     .file-tab:nth-child(1) .tab-header { left: -3px; }
     .file-tab:nth-child(2) .tab-header { left: 40%; } 
 
-    /* 파일 몸통 내부 디자인 */
-    .tab-body { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; height: 100%; padding: 30px 40px; box-sizing: border-box; }
-    .tab-desc { font-family: monospace; color: var(--vivid-blue); font-size: 1.2rem; font-weight: bold; opacity: 0.7; }
+    /* [핵심] 텍스트 상단 배치 (align-items: flex-start) */
+    .tab-body { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; height: 100%; padding: 25px 40px; }
+    .tab-desc { font-family: monospace; color: var(--vivid-blue); font-size: 1.2rem; font-weight: bold; opacity: 0.7; word-break: keep-all; margin-top: 5px; }
     .tab-meta { font-family: monospace; color: var(--vivid-blue); font-size: 3rem; font-weight: 900; line-height: 1; }
 
     @media (hover: hover) and (pointer: fine) { 
       .file-tab:hover { transform: translateY(-20px); z-index: 10; box-shadow: 0 25px 40px rgba(0,51,255,0.2); } 
     }
-    
-    /* 선택(클릭) 시 반전 애니메이션 */
     .file-tab.selected { transform: translateY(-40px) scale(1.02); background-color: var(--vivid-blue); z-index: 20; }
     .file-tab.selected .tab-desc, .file-tab.selected .tab-meta { color: var(--bg-white); }
     .file-tab.selected .tab-header { background-color: var(--bg-white); color: var(--vivid-blue); border-color: var(--bg-white); }
 
-
-    /* --- 매거진 페이지 --- */
+    /* --- 매거진 & 아카이브 (유지) --- */
     #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
     .magazine-split-view { display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative; }
     .mag-list-side { flex: 1.2; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px; position: relative; }
@@ -204,7 +185,6 @@
     #mag-content-overlay::-webkit-scrollbar { width: 4px; }
     #mag-content-overlay::-webkit-scrollbar-thumb { background: var(--bg-white); }
 
-    /* --- 아카이브 페이지 --- */
     #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     .bookshelf-container { display: flex; height: 60vh; width: 80%; max-width: 1000px; border: 2px solid var(--vivid-blue); border-top: none; padding: 0 15px 15px 15px; gap: 8px; align-items: flex-end; margin-bottom: 2rem; }
     .book-spine { flex: 1; height: 95%; border: 1px solid var(--vivid-blue); background-color: var(--crt-dark); color: var(--vivid-blue); writing-mode: vertical-rl; transform: rotate(180deg); display: flex; justify-content: center; align-items: center; font-family: monospace; font-size: 1.8rem; font-weight: bold; letter-spacing: 6px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -212,46 +192,45 @@
 
     .detail-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     .detail-container { display: flex; gap: 40px; width: 80%; max-width: 1000px; height: 60vh; align-items: center; }
-    .detail-image-area { flex: 1; height: 100%; border: 1px solid var(--vivid-blue); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .detail-image-area { flex: 1; height: 100%; border: 1px solid var(--vivid-blue); background-size: contain; background-repeat: no-repeat; background-position: center; overflow-x: auto; display: flex; align-items: center; padding: 20px; scrollbar-width: thin; scrollbar-color: var(--vivid-blue) transparent; }
     .detail-text-area { flex: 1; text-align: left; }
 
     /* =========================================
-       5. 반응형 웹 최적화 (Mobile UI 대폭 강화)
+       5. 반응형 웹 최적화 (Mobile UI)
        ========================================= */
     @media (max-width: 768px) {
       #global-logo { top: 60px; left: 15px; width: 30px; height: 30px; }
       #expose-btn { width: 70px; height: 70px; }
-      
       #global-tabs { height: 40px; }
       .g-tab { min-width: 100px; font-size: 0.8rem; padding: 0 10px; }
 
       .team-header h1 { letter-spacing: 5px; }
-      .team-header p { font-size: 0.9rem; }
+      .team-header p { font-size: 0.9rem; word-break: keep-all; }
+      .grand-menu { flex-direction: column; gap: 10px; width: 85%; }
+      .gm-btn { text-align: center; white-space: nowrap; word-break: keep-all; }
+
+      .file-tab { width: 90vw; height: auto; min-height: 110px; margin-top: -15px; border-width: 2px; }
+      .tab-header { top: -35px; height: 35px; font-size: 1.1rem; padding: 5px 15px; border-width: 2px; }
+      .file-tab:nth-child(2) .tab-header { left: auto; right: -2px; }
       
-      .grand-menu { flex-direction: column; gap: 10px; width: 80%; }
-      .gm-btn { text-align: center; }
+      /* 모바일 환경 텍스트 상단 배치 */
+      .tab-body { padding: 15px 20px; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 5px; }
+      .tab-desc { font-size: 0.9rem; line-height: 1.3; margin-top: 0; }
+      .tab-meta { font-size: 1.8rem; position: static; }
 
-      /* 모바일 서류철 밸런스 조정 */
-      .file-tab { width: 90vw; height: 120px; margin-top: -20px; border-width: 2px; }
-      .tab-header { top: -40px; height: 40px; font-size: 1.2rem; padding: 5px 20px; border-width: 2px; }
-      .tab-body { padding: 20px; }
-      .tab-desc { font-size: 0.9rem; }
-      .tab-meta { font-size: 2rem; }
-      .file-tab:nth-child(2) .tab-header { left: 35%; }
-
-      .magazine-split-view { flex-direction: column; height: 80vh; justify-content: flex-start; gap: 0; margin-top: 10vh; }
-      .mag-list-side { width: 85%; padding-left: 0; border-left: none; position: relative; z-index: 30; }
-      .mag-mobile-toggle { display: block; padding: 12px; border: 1px solid var(--bg-white); color: var(--bg-white); font-family: monospace; font-size: 1.1rem; text-align: center; cursor: pointer; background: var(--vivid-blue); transition: all 0.3s ease; letter-spacing: 1px; }
+      .magazine-split-view { flex-direction: column; height: calc(100vh - 160px); justify-content: flex-start; gap: 0; margin-top: 70px; }
+      .mag-list-side { width: 90%; padding-left: 0; border-left: none; position: relative; z-index: 30; }
+      .mag-mobile-toggle { display: block; padding: 12px; border: 1px solid var(--bg-white); color: var(--bg-white); font-family: monospace; font-size: 1rem; text-align: center; cursor: pointer; background: var(--vivid-blue); transition: all 0.3s ease; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
       .mag-list-items { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: var(--vivid-blue); border: 1px solid var(--bg-white); border-top: none; padding: 20px; box-sizing: border-box; flex-direction: column; gap: 1.5rem; max-height: 50vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
       .mag-list-side.open .mag-list-items { display: flex; }
       .mag-list-side.open .mag-mobile-toggle { background: var(--bg-white); color: var(--vivid-blue); font-weight: bold; }
-      .mag-label { font-size: 2rem; }
-      .mag-item.active { transform: translateX(15px); } 
-      .mag-preview-side { flex: 1; width: 100%; margin-top: 20px; display: flex; align-items: flex-start; }
-      #mag-display-box { width: 90%; height: 55vh; max-height: 55vh; padding: 25px; }
+      .mag-label { font-size: 1.8rem; }
+      .mag-item.active { transform: translateX(10px); } 
+      .mag-preview-side { flex: 1; width: 100%; margin-top: 15px; display: flex; align-items: flex-start; height: 100%; overflow: hidden; }
+      #mag-display-box { width: 90%; height: 100%; max-height: none; padding: 20px; }
       #mag-content-overlay { font-size: 0.9rem; }
 
-      .bookshelf-container { width: 90%; padding: 0 5px 10px 5px; overflow-x: auto; justify-content: flex-start; }
+      .bookshelf-container { height: calc(100vh - 250px); width: 90%; padding: 0 5px 10px 5px; overflow-x: auto; justify-content: flex-start; margin-top: 20px; }
       .book-spine { min-width: 60px; font-size: 1.2rem; }
       
       .page-title { font-size: 2rem !important; margin-bottom: 1rem; margin-top: 30px; }
@@ -261,7 +240,7 @@
       .detail-text-area h2 { font-size: 2rem; margin-bottom: 10px; }
       .detail-text-area p { font-size: 0.95rem; }
 
-      .members-initial-grid { display: flex; flex-direction: column; height: 45vh; overflow-y: auto; gap: 2.5rem; padding-top: 20px; width: 90%; }
+      .members-initial-grid { display: flex; flex-direction: column; height: 65vh; overflow-y: auto; gap: 2.5rem; padding-top: 0; width: 90%; }
       .grid-crosshair-x, .grid-crosshair-y { display: none; } 
       .member-box { flex-direction: column; width: 100%; position: relative; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.3); }
       .member-box:last-child { border-bottom: none; }
@@ -271,11 +250,11 @@
       .detail-name { font-size: 2.2rem; margin-bottom: 10px; }
       .detail-manifesto { font-size: 0.95rem; }
 
-      .btn-return, .btn-back-archive { bottom: 3% !important; font-size: 0.8rem; padding: 10px 16px; }
+      .btn-return, .btn-back-archive { bottom: 25px !important; font-size: 0.85rem; padding: 12px 20px; }
     }
   </style>
 </head>
-<body class="crt-flicker">
+<body>
   
   <div id="global-tabs" class="theme-bw">
     <div class="g-tab active" data-target="grand-main-page">TEAM ROOT</div>
@@ -302,7 +281,13 @@
       <div class="gm-btn locked">[ VOL.2 : LOCKED ]</div>
       <div class="gm-btn locked">[ VOL.3 : LOCKED ]</div>
     </div>
-    
+    <div class="grand-menu" style="margin-top: -10px;">
+      <div class="gm-btn info-btn" data-target="members-page">[ TEAM INFO : MEMBERS ]</div>
+    </div>
+  </div>
+
+  <div id="members-page" class="page-layer">
+    <h1 class="page-title" style="font-size: 3rem; margin-top: 10vh; margin-bottom: 2rem; letter-spacing: 5px;">TEAM MEMBERS</h1>
     <div class="members-initial-grid">
       <div class="grid-crosshair-x"></div><div class="grid-crosshair-y"></div>
       <div class="member-box">
@@ -338,6 +323,7 @@
         </div>
       </div>
     </div>
+    <button class="retro-btn btn-return">[ RETURN TO ROOT ]</button>
   </div>
 
   <div id="vol1-main-content" class="page-layer">
@@ -454,15 +440,17 @@
           tab.classList.remove('active');
           if (targetId.includes('vol1') || targetId.includes('mag') || targetId.includes('arch') || targetId.includes('detail')) {
             if (tab.dataset.target === 'vol1-main-content') tab.classList.add('active');
-          } else if (targetId === 'grand-main-page') {
+          } else if (targetId === 'grand-main-page' || targetId === 'members-page') {
             if (tab.dataset.target === 'grand-main-page') tab.classList.add('active');
           }
         });
 
-        if (targetId === 'grand-main-page') {
+        // 흑백 테마 적용 (루트 & 멤버 페이지)
+        if (targetId === 'grand-main-page' || targetId === 'members-page') {
           dom.tabsContainer.className = 'theme-bw visible';
           dom.logo.className = 'theme-white'; 
         } else {
+          // 파란 테마 적용 (VOL.1 하위)
           dom.tabsContainer.className = 'theme-blue visible';
           if (targetId === 'vol1-main-content') dom.logo.className = 'theme-black';
           else if (targetId === 'magazine-page') dom.logo.className = 'theme-white';

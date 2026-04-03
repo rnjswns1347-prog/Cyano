@@ -16,7 +16,6 @@
     
     *, *::before, *::after { box-sizing: border-box; }
     
-    /* [기능] 마우스 커서를 도면용 십자선으로 강제 변경 */
     body, html {
       margin: 0; padding: 0; width: 100%; height: 100%;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -31,7 +30,6 @@
     /* =========================================
        2. 시각적 질감 (Paper Grain & HUD & Ruler)
        ========================================= */
-    /* [신설] 종이 질감(화학 약품 노이즈) 오버레이 */
     .paper-grain {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       pointer-events: none; z-index: 9998; opacity: 0.15;
@@ -39,7 +37,6 @@
       mix-blend-mode: overlay;
     }
 
-    /* [신설] 실시간 눈금자(Ruler) */
     .ruler-x, .ruler-y { position: fixed; z-index: 8500; pointer-events: none; opacity: 0.6; transition: border-color 0.5s, opacity 0.5s; }
     .ruler-x { top: 45px; left: 15px; right: 0; height: 15px; border-bottom: 1px solid var(--ruler-line); background: repeating-linear-gradient(to right, transparent, transparent 49px, var(--ruler-line) 49px, var(--ruler-line) 50px); }
     .ruler-y { top: 45px; left: 0; bottom: 0; width: 15px; border-right: 1px solid var(--ruler-line); background: repeating-linear-gradient(to bottom, transparent, transparent 49px, var(--ruler-line) 49px, var(--ruler-line) 50px); }
@@ -47,11 +44,9 @@
     .marker-x { top: 0; height: 15px; width: 2px; }
     .marker-y { left: 0; width: 15px; height: 2px; }
 
-    /* 테마별 눈금자 색상 동적 전환 */
     body.theme-bw-body { --ruler-line: rgba(255,255,255,0.2); --marker-color: #fff; }
     body.theme-blue-body { --ruler-line: rgba(0,51,255,0.2); --marker-color: var(--vivid-blue); }
 
-    /* [신설] 실시간 마우스 좌표계 HUD */
     #cursor-hud {
       position: fixed; bottom: 20px; right: 30px;
       font-family: monospace; font-size: 0.9rem; font-weight: bold;
@@ -61,7 +56,6 @@
     body.theme-bw-body #cursor-hud { color: var(--bg-white); border-color: rgba(255,255,255,0.3); }
     body.theme-blue-body #cursor-hud { color: var(--vivid-blue); border-color: rgba(0,51,255,0.3); }
 
-    /* CRT 스캔라인 오버레이 (깜빡임 애니메이션은 제거됨) */
     .crt-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
@@ -112,8 +106,9 @@
     .retro-btn { background: transparent; color: var(--vivid-blue); border: 2px solid var(--vivid-blue); padding: 12px 24px; font-size: 1rem; font-family: monospace; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; box-shadow: 0 0 10px var(--vivid-blue), inset 0 0 10px var(--vivid-blue); text-shadow: 0 0 5px var(--vivid-blue); transition: all 0.2s ease; }
     .retro-btn:hover { background: var(--vivid-blue); color: var(--crt-dark); }
     .btn-return, .btn-back-archive { position: absolute !important; bottom: 5% !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999 !important; white-space: nowrap; }
-    #magazine-page .btn-return, #members-page .btn-return { color: var(--bg-white) !important; border-color: var(--bg-white) !important; box-shadow: none; text-shadow: none; }
-    #magazine-page .btn-return:hover, #members-page .btn-return:hover { background: var(--bg-white) !important; color: var(--crt-dark) !important; }
+    
+    #magazine-page .btn-return { color: var(--bg-white) !important; border-color: var(--bg-white) !important; box-shadow: none; text-shadow: none; }
+    #magazine-page .btn-return:hover { background: var(--bg-white) !important; color: var(--crt-dark) !important; }
 
     /* =========================================
        4. 각 페이지 레이어 및 구조
@@ -131,29 +126,9 @@
     .gm-btn:hover { background: var(--bg-white); color: var(--crt-dark); transform: translateY(-3px); }
     .gm-btn.locked { opacity: 0.3; cursor: not-allowed; border-style: dashed; }
     .gm-btn.locked:hover { background: transparent; color: var(--bg-white); transform: none; }
-    .gm-btn.info-btn { border-color: var(--vivid-blue); color: var(--vivid-blue); }
-    .gm-btn.info-btn:hover { background: var(--vivid-blue); color: var(--bg-white); }
 
-    /* [기능] 치수선 인터랙션 (버튼용) */
     .dim-line-top { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: monospace; font-size: 0.75rem; color: inherit; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
     .gm-btn:hover .dim-line-top { opacity: 0.7; }
-
-    /* --- 멤버 독립 공간 --- */
-    #members-page { background-color: var(--crt-dark); color: var(--bg-white); justify-content: flex-start; padding-top: 10vh; }
-    .members-initial-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 80%; max-width: 900px; height: 60vh; margin: 0 auto; }
-    .grid-crosshair-x { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.15); pointer-events: none; }
-    .grid-crosshair-y { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255, 255, 255, 0.15); pointer-events: none; }
-    .member-box { display: flex; align-items: center; justify-content: center; cursor: pointer; position: static; }
-    .member-initial { font-size: clamp(6rem, 12vw, 10rem); font-weight: 900; color: var(--bg-white); transition: all 0.5s ease; }
-    .members-initial-grid:hover .member-initial { opacity: 0; }
-    .members-initial-grid .member-box:hover .member-initial { opacity: 1; transform: scale(1.1); }
-    .member-detail { position: absolute; top: 0; bottom: 0; width: 50%; display: flex; flex-direction: column; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.6s ease; color: var(--bg-white); }
-    .detail-right { right: 0; padding-left: 60px; text-align: left; }
-    .detail-left { left: 0; padding-right: 60px; text-align: right; }
-    .member-box:hover .member-detail { opacity: 1; transform: translateX(0); }
-    .detail-role { font-family: monospace; letter-spacing: 2px; opacity: 0.6; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-    .detail-name { font-size: 3rem; font-weight: 900; margin: 0 0 15px 0; letter-spacing: -2px; line-height: 1; }
-    .detail-manifesto { font-size: 1.05rem; line-height: 1.6; font-weight: bold; word-break: keep-all; }
 
     /* --- VOL.1 서류철(File Layout) --- */
     #vol1-main-content { background-color: var(--bg-white); }
@@ -171,7 +146,6 @@
     .tab-desc { font-family: monospace; color: var(--vivid-blue); font-size: 1.2rem; font-weight: bold; opacity: 0.7; word-break: keep-all; margin-top: 5px; }
     .tab-meta { font-family: monospace; color: var(--vivid-blue); font-size: 3rem; font-weight: 900; line-height: 1; }
 
-    /* [기능] 치수선 인터랙션 (서류철용) */
     .dim-line-side { position: absolute; right: -40px; top: 50%; transform: translateY(-50%) rotate(90deg); font-family: monospace; font-size: 0.85rem; color: var(--vivid-blue); opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
     @media (hover: hover) and (pointer: fine) { 
       .file-tab:hover { transform: translateY(-20px); z-index: 10; box-shadow: 0 25px 40px rgba(0,51,255,0.2); } 
@@ -181,7 +155,7 @@
     .file-tab.selected .tab-desc, .file-tab.selected .tab-meta { color: var(--bg-white); }
     .file-tab.selected .tab-header { background-color: var(--bg-white); color: var(--vivid-blue); border-color: var(--bg-white); }
 
-    /* --- 매거진 페이지 --- */
+    /* --- 매거진 & 아카이브 --- */
     #magazine-page { background-color: var(--vivid-blue); color: var(--bg-white); }
     .magazine-split-view { display: flex; width: 85%; height: 65vh; align-items: center; justify-content: space-between; position: relative; }
     .mag-list-side { flex: 1.2; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 50px; position: relative; }
@@ -194,7 +168,6 @@
     .mag-num { font-family: monospace; font-size: 1.2rem; font-weight: bold; }
     .mag-label { font-size: clamp(2.5rem, 5.5vw, 4.5rem); font-weight: 900; margin: 0; line-height: 1; letter-spacing: -3px; text-transform: uppercase; }
     
-    /* [기능] 매거진 리스트 치수선 */
     .mag-item .dim-line-top { left: 0; transform: none; top: -10px; font-size: 0.7rem; color: var(--bg-white); }
     .mag-item:hover .dim-line-top { opacity: 0.8; }
 
@@ -204,12 +177,10 @@
     #mag-content-overlay::-webkit-scrollbar { width: 4px; }
     #mag-content-overlay::-webkit-scrollbar-thumb { background: var(--bg-white); }
 
-    /* --- 아카이브 페이지 (책꽂이) --- */
     #archive-page { background-color: var(--crt-dark); color: var(--vivid-blue); }
     .bookshelf-container { display: flex; height: 60vh; width: 80%; max-width: 1000px; border: 2px solid var(--vivid-blue); border-top: none; padding: 0 15px 15px 15px; gap: 8px; align-items: flex-end; margin-bottom: 2rem; position: relative; }
     .book-spine { flex: 1; height: 95%; border: 1px solid var(--vivid-blue); background-color: var(--crt-dark); color: var(--vivid-blue); writing-mode: vertical-rl; transform: rotate(180deg); display: flex; justify-content: center; align-items: center; font-family: monospace; font-size: 1.8rem; font-weight: bold; letter-spacing: 6px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
     
-    /* [기능] 책등 치수선 (세로형) */
     .book-spine .dim-line-side { right: -30px; color: var(--bg-white); }
     .book-spine:hover { background-color: var(--vivid-blue); color: var(--bg-white); flex: 1.6; height: 100%; box-shadow: 0 0 20px rgba(0, 51, 255, 0.4); }
     .book-spine:hover .dim-line-side { opacity: 0.8; }
@@ -223,7 +194,6 @@
        5. 반응형 웹 최적화 (Mobile UI 대폭 강화)
        ========================================= */
     @media (max-width: 768px) {
-      /* 모바일에서는 눈금자 숨김 처리 (공간 절약) */
       .ruler-x, .ruler-y { display: none; }
       #cursor-hud { bottom: 10px; right: 10px; font-size: 0.75rem; background: var(--crt-dark); border: none; }
 
@@ -236,13 +206,12 @@
       .grand-menu { flex-direction: column; gap: 10px; width: 85%; }
       .gm-btn { text-align: center; white-space: nowrap; word-break: keep-all; }
 
-      .file-tab { width: 90vw; height: auto; min-height: 120px; margin-top: -15px; border-width: 2px; }
+      .file-tab { width: 90vw; height: auto; min-height: 110px; margin-top: -15px; border-width: 2px; }
       .tab-header { top: -35px; height: 35px; font-size: 1.1rem; padding: 5px 15px; border-width: 2px; }
       .file-tab:nth-child(2) .tab-header { left: auto; right: -2px; }
       .tab-body { padding: 15px 20px; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 5px; }
       .tab-desc { font-size: 0.9rem; line-height: 1.3; margin-top: 0; }
       .tab-meta { font-size: 1.8rem; position: static; }
-      /* 모바일 치수선 숨김 */
       .dim-line-top, .dim-line-side { display: none; }
 
       .magazine-split-view { flex-direction: column; height: calc(100vh - 160px); justify-content: flex-start; gap: 0; margin-top: 70px; }
@@ -266,16 +235,6 @@
       .detail-text-area { text-align: center; justify-content: flex-start; overflow-y: auto; padding-bottom: 20px; }
       .detail-text-area h2 { font-size: 2rem; margin-bottom: 10px; }
       .detail-text-area p { font-size: 0.95rem; }
-
-      .members-initial-grid { display: flex; flex-direction: column; height: 65vh; overflow-y: auto; gap: 2.5rem; padding-top: 0; width: 90%; }
-      .grid-crosshair-x, .grid-crosshair-y { display: none; } 
-      .member-box { flex-direction: column; width: 100%; position: relative; gap: 10px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.3); }
-      .member-box:last-child { border-bottom: none; }
-      .member-initial { font-size: 4rem; opacity: 1; text-align: center; margin-bottom: 5px; } 
-      .members-initial-grid:hover .member-initial { opacity: 1; } 
-      .member-detail { position: relative; opacity: 1; pointer-events: auto; width: 100%; transform: none !important; padding: 0 !important; text-align: center !important; }
-      .detail-name { font-size: 2.2rem; margin-bottom: 10px; }
-      .detail-manifesto { font-size: 0.95rem; }
 
       .btn-return, .btn-back-archive { bottom: 25px !important; font-size: 0.85rem; padding: 12px 20px; }
     }
@@ -318,52 +277,6 @@
       <div class="gm-btn locked scramble">[ VOL.2 : LOCKED ]</div>
       <div class="gm-btn locked scramble">[ VOL.3 : LOCKED ]</div>
     </div>
-    <div class="grand-menu" style="margin-top: -10px;">
-      <div class="gm-btn info-btn scramble" data-target="members-page">
-        [ TEAM INFO : MEMBERS ]
-        <div class="dim-line-top">|← SELECT →|</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="members-page" class="page-layer">
-    <h1 class="page-title scramble" style="font-size: 3rem; margin-top: 10vh; margin-bottom: 2rem; letter-spacing: 5px;">TEAM MEMBERS</h1>
-    <div class="members-initial-grid">
-      <div class="grid-crosshair-x"></div><div class="grid-crosshair-y"></div>
-      <div class="member-box">
-        <div class="member-initial scramble">M</div>
-        <div class="member-detail detail-right">
-          <div class="detail-role">VISUAL JUSTIFIER</div>
-          <h2 class="detail-name">문유경</h2>
-          <p class="detail-manifesto">"내가 내 눈으로 본 세상과 의도를 시각적 언어로 번역합니다. 파편화된 이미지들을 모아 흔들리지 않는 하나의 정당한 층(Layer)으로 증명해 냅니다."</p>
-        </div>
-      </div>
-      <div class="member-box">
-        <div class="member-initial scramble">R</div>
-        <div class="member-detail detail-left">
-          <div class="detail-role">LOGIC ARCHITECT</div>
-          <h2 class="detail-name">류선우</h2>
-          <p class="detail-manifesto">"우리의 취향이 곧 세계가 되도록 논리의 뼈대를 세웁니다. 관람객이 이 공간에 설득당할 수밖에 없는 완벽한 흐름과 동선을 설계합니다."</p>
-        </div>
-      </div>
-      <div class="member-box">
-        <div class="member-initial scramble">J</div>
-        <div class="member-detail detail-right">
-          <div class="detail-role">TASTE CURATOR</div>
-          <h2 class="detail-name">권준</h2>
-          <p class="detail-manifesto">"무엇이 그럴듯한지, 무엇이 우리의 세계관에 부합하는지 치밀하게 판별합니다. 타협하지 않는 기준으로 이 터미널의 순도를 유지합니다."</p>
-        </div>
-      </div>
-      <div class="member-box">
-        <div class="member-initial scramble">H</div>
-        <div class="member-detail detail-left">
-          <div class="detail-role">CYAN OPERATOR</div>
-          <h2 class="detail-name">황윤하</h2>
-          <p class="detail-manifesto">"푸른빛의 감광액을 바르고 빛을 쪼여 실체를 기록합니다. 추상적인 우리의 선언을 물리적인 결과물로 변환하여 세상에 남깁니다."</p>
-        </div>
-      </div>
-    </div>
-    <button class="retro-btn btn-return">[ RETURN TO ROOT ]</button>
   </div>
 
   <div id="vol1-main-content" class="page-layer">
@@ -483,23 +396,18 @@
 
       history.replaceState({ target: null }, '', window.location.pathname);
 
-      // --- [기능] 마우스 실시간 좌표계 & 눈금자 추적 로직 ---
       document.addEventListener('mousemove', (e) => {
-        // HUD 업데이트
         if (dom.hud) {
           const x = String(e.clientX).padStart(4, '0');
           const y = String(e.clientY).padStart(4, '0');
           dom.hud.innerText = `POS: X:${x} Y:${y}`;
         }
-        // 눈금자 마커 위치 업데이트
         if (dom.rxMarker) dom.rxMarker.style.transform = `translateX(${e.clientX - 15}px)`;
         if (dom.ryMarker) dom.ryMarker.style.transform = `translateY(${e.clientY - 45}px)`;
       });
 
-      // --- [기능] 텍스트 디코딩 (Scramble) 로직 ---
       const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
       document.querySelectorAll('.scramble').forEach(el => {
-        // 원본 텍스트를 data 속성에 백업 (태그 안의 자식 요소는 무시하고 텍스트만 추출)
         el.setAttribute('data-original', el.innerText.trim());
         el.addEventListener('mouseenter', () => {
           let iteration = 0;
@@ -510,7 +418,7 @@
               return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
             }).join('');
             if (iteration >= el.dataset.original.length) { clearInterval(el.scrambleInterval); }
-            iteration += 1 / 3; // 해독 속도
+            iteration += 1 / 3; 
           }, 30);
         });
       });
@@ -526,13 +434,12 @@
           tab.classList.remove('active');
           if (targetId.includes('vol1') || targetId.includes('mag') || targetId.includes('arch') || targetId.includes('detail')) {
             if (tab.dataset.target === 'vol1-main-content') tab.classList.add('active');
-          } else if (targetId === 'grand-main-page' || targetId === 'members-page') {
+          } else if (targetId === 'grand-main-page') {
             if (tab.dataset.target === 'grand-main-page') tab.classList.add('active');
           }
         });
 
-        // 흑백 테마 / 파란 테마 동적 전환
-        if (targetId === 'grand-main-page' || targetId === 'members-page') {
+        if (targetId === 'grand-main-page') {
           document.body.className = 'theme-bw-body';
           dom.tabsContainer.className = 'theme-bw visible';
           dom.logo.className = 'theme-white'; 
@@ -597,7 +504,7 @@
           dom.exposeBg.classList.remove('exposed');
           dom.logo.className = 'theme-white'; 
           dom.tabsContainer.classList.remove('visible'); 
-          document.body.className = 'theme-blue-body'; // 시작화면은 파란색 기준
+          document.body.className = 'theme-blue-body'; 
           
           setTimeout(() => {
             Object.values(pages).forEach(p => { p.classList.remove('scanning', 'fast', 'slow'); p.style.zIndex = 40; });
